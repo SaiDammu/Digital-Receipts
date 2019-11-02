@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>FoundWorkingCopyPaths</key>
+	<array>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2</string>
+	</array>
+	<key>LastWorkingCopyScanDate</key>
+	<date>2013-12-17T05:45:13Z</date>
+	<key>MissingFilePaths</key>
+	<array>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/res/alert-gray-button@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/Default-568h@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlertBackground.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/buttonR.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/QBlueClient.h</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/buttonB.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlertShadowMask.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/res/alert-window@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlertButtonPressed@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/res/alert-black-button@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/Default.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlertButton.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/CustomAlertView.h</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/button.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/QnMain.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/QBlueAudio.m</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/BleLogo.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/CustomAlertView.m</string>
+		<string>/Users/quintic/Desktop/working/Test/streamer/QBlueVoLEAppDelegate.m</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/res/alert-red-button.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/QBlueClient.m</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/QBlueVoLEViewController.h</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlertShadowMask@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/res/alert-black-button.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/res/alert-red-button@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/quintic logo.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlertButtonPressed.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/QBlueVoLEViewController.m</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlertButton@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/QBlueAudio.h</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlert.m</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlertBackground@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/QBlueVoLEViewController.xib</string>
+		<string>/Users/quintic/Desktop/working/Test/streamer/QBlueVoLEAppDelegate.h</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/res/alert-gray-button.png</string>
+		<string>/Users/quintic/Desktop/working/Test/streamer/resource/MainWindow.xib</string>
+		<string>/Users/quintic/Desktop/working/Test/Default@2x.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/TableViewAlert.h</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/res/alert-window.png</string>
+		<string>/Users/quintic/Desktop/working/Test/QBlueVoLE2/VoLE.png</string>
+	</array>
+	<key>Version</key>
+	<integer>4</integer>
+</dict>
+</plist>
