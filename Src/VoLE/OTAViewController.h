@@ -1,8 +1,8 @@
 //
-//  QBlueVoLEViewController.h
+//  OTAViewController.h
 //  VoLE Demo
 //
-//  Created by Sai Seshu Sarath Chandra Dammu on 11/16/19.
+//  Created by Sai Seshu Sarath Chandra Dammu on 11/24/19.
 //  Copyright © 2019 Apple Inc. All rights reserved.
 //
 
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface QBlueVoLEViewController : UIViewController
+@interface OTAViewController : UIViewController
 
 @end
 

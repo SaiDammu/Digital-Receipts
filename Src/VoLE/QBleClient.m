@@ -7,7 +7,6 @@
 //
 //Orbital
 
-
 #import "QBlueClient.h"
 #import "QBlueDefine.h"
 
@@ -49,25 +48,7 @@ volatile int initialcount = 0;
 //volatile double RegY[5];
 //volatile float CenterTap;
 
-// Chart
-@import Charts;
-
-@interface CubicLineSampleFillFormatter : NSObject <IChartFillFormatter>
-{
-}
-@end
-
-@implementation CubicLineSampleFillFormatter
-
-- (CGFloat)getFillLinePositionWithDataSet:(LineChartDataSet *)dataSet dataProvider:(id<LineChartDataProvider>)dataProvider
-{
-    return -10.f;
-}
-@end
-@interface QBlueVoLEViewController ()<ChartViewDelegate> {
-    
-    int sendValue;
-    
+@interface QBlueVoLEViewController () {
     uint32_t received_data_length;
     NSDate *refDate;
     NSDate *intDate;
@@ -127,13 +108,12 @@ volatile int initialcount = 0;
          
          BOOL fEdited;
     BOOL pauseGraph;
-    UIBarButtonItem *scanDisconnectItem;
     // qpp end
 }
 
 @property (strong, nonatomic) NSTimer *voleScanDevTimeoutTimer;
 @property (strong, nonatomic) NSTimer *voleDidConnDevTimeoutTimer;
-@property (weak, nonatomic) IBOutlet LineChartView *chartView;
+@property (weak, nonatomic) IBOutlet UITextField *dataSendTextField;
 
 @end
 
@@ -264,12 +244,14 @@ volatile int initialcount = 0;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    sendValue = 20;
-    scanDisconnectItem = [[UIBarButtonItem alloc]initWithTitle:@"Scan" style:UIBarButtonItemStylePlain target:self action:@selector(searchDisconnectButtonAction:)];
-    scanDisconnectItem.tag = 1;
-    scanDisconnectItem.tintColor = [UIColor whiteColor];
- 
-    self.navigationItem.rightBarButtonItem = scanDisconnectItem;
+    
+    //Device validation
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        
+    }else{
+        
+    }
+    
     
     
     NSDate *date = [NSDate date];
@@ -301,7 +283,7 @@ volatile int initialcount = 0;
    // _myGraph.delegate = self;
   //  float p;
     //[self.myGraph reloadGraph];
-       for (int i=0; i < 500; i++)
+    for (int i=0; i < 1000; i++)
     {
        // p=1*sin(0.5*i)+100;
         [self.ArrayOfValues1 addObject:[NSNumber numberWithFloat:(99999)]]; // Random values for the graph
@@ -309,35 +291,9 @@ volatile int initialcount = 0;
         
     }
     
-    _chartView.delegate = self;
-        
-        [_chartView setViewPortOffsetsWithLeft:0.f top:20.f right:0.f bottom:0.f];
-        _chartView.backgroundColor = [UIColor colorWithRed:104/255.f green:241/255.f blue:175/255.f alpha:1.f];
-
-        _chartView.chartDescription.enabled = NO;
-        
-        _chartView.dragEnabled = YES;
-        [_chartView setScaleEnabled:YES];
-        _chartView.pinchZoomEnabled = NO;
-        _chartView.drawGridBackgroundEnabled = NO;
-        _chartView.maxHighlightDistance = 300.0;
-        
-        _chartView.xAxis.enabled = NO;
-        
-        ChartYAxis *yAxis = _chartView.leftAxis;
-        yAxis.labelFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:12.f];
-        [yAxis setLabelCount:6 force:NO];
-        yAxis.labelTextColor = UIColor.whiteColor;
-        yAxis.labelPosition = YAxisLabelPositionInsideChart;
-        yAxis.drawGridLinesEnabled = NO;
-        yAxis.axisLineColor = UIColor.whiteColor;
-        
-        _chartView.rightAxis.enabled = NO;
-        _chartView.legend.enabled = NO;
     
-        
-        [_chartView animateWithXAxisDuration:2.0 yAxisDuration:2.0];
-    
+    _RespGraph.delegate = self;
+    [self.RespGraph reloadGraph];
     // Do any additional setup after loading the view from its nib.
     self.title = @"VoLE Demo";
     self.temperature.text=@" ";
@@ -427,7 +383,7 @@ volatile int initialcount = 0;
        [self regNotification];
        
        flagOnePeriScanned = FALSE;
-       
+        [self ScanPeri];
     
     //qpp end
     
@@ -447,7 +403,8 @@ volatile int initialcount = 0;
          [commandToSend appendBytes:&whole_byte length:1];
      }
      NSLog(@"%@", commandToSend);
-   
+     pauseGraph = YES;
+     [_RespGraph reloadGraph];
      [qppApi qppSendData : devInfo.qppPeri
                          withData : commandToSend
                          withType : CBCharacteristicWriteWithoutResponse/* CBCharacteristicWriteWithResponse */];
@@ -455,16 +412,7 @@ volatile int initialcount = 0;
               qppCentState = QPP_CENT_IDLE;
      [self readQpp];
     
-    
 }
-
-
--(void)searchDisconnectButtonAction:(UIBarButtonItem*)item{
-    [self ScanPeri];
-    
-}
-
-
 -(void)ScanPeri{
     qBleClient *dev = [qBleClient sharedInstance];
     
@@ -473,36 +421,16 @@ volatile int initialcount = 0;
     
     if (isConnected)
 #endif
-    
-    CBPeripheralState stateConnected = devInfo.qppPeri.state; /// iOS 9.0.2
-    if (stateConnected==CBPeripheralStateConnected)/// iOS 9.0.2
-    {
-      //  [self qppReset];
-        
-        qppCentState = QPP_CENT_DISCONNECTING;
-        
-        [dev pubDisconnectPeripheral : devInfo.qppPeri];
-        scanDisconnectItem.title = @"Disconnect";
-    }
-    else
-    {
+
         if((qppCentState != QPP_CENT_SCANNING) &&
            (qppCentState != QPP_CENT_CONNECTING) )
         {
             qppCentState = QPP_CENT_SCANNING;
-            
-            //[self.ptScanDevActInd startAnimating];
-            
+
             [dev stopScan];
             
-           // [dev startScan];
-            
-             scanDisconnectItem.title = @"Scan";
+            [dev startScan];
         }
-    }
-    if ([scanDisconnectItem.title isEqualToString:@"Scan"]){
-        [dev startScan];
-    }
 }
 -(void)initDevicesInfo{
     devInfo = [[DevicesCtrl alloc] init];
@@ -600,55 +528,19 @@ volatile int initialcount = 0;
                 withNtfChar : devInfo.aQppNtfChar
                  withEnable : YES];
     
-  //  [self setDataCount];
+  //  [self.myGraph reloadGraph];
+    
+    
+    if (pauseGraph) {
+        [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:NO block:^(NSTimer * _Nonnull timer) {
+            [self.RespGraph reloadGraph];
+        }];
+    }else{
+     [self.RespGraph reloadGraph];
+    }
     
 }
--(void)setDataCount{
-    NSMutableArray *yVals1 = [[NSMutableArray alloc] init];
-        for (int i = 0; i < self.ArrayOfValues1.count; i++)
-        {
-           // double mult = (15 + 1);
-           // double val = (double) (arc4random_uniform(mult)) + 20;
-            [yVals1 addObject:[[ChartDataEntry alloc] initWithX:i y:[[_ArrayOfValues1 objectAtIndex:i]doubleValue]]];
-        }
-//        for (int i = 0; i < _vvaluesArray.count; i++)
-//        {
-//            double val = [[_vvaluesArray objectAtIndex:i]doubleValue];
-//            [yVals1 addObject:[[ChartDataEntry alloc] initWithX:val y:val icon: [UIImage imageNamed:@"icon"]]];
-//          //  [values removeObjectAtIndex:0];
-//        }
-    
-    LineChartDataSet *set1 = nil;
-    if (_chartView.data.dataSetCount > 0)
-    {
-        set1 = (LineChartDataSet *)_chartView.data.dataSets[0];
-        [set1 replaceEntries:yVals1];
-        [_chartView.data notifyDataChanged];
-        [_chartView notifyDataSetChanged];
-    }
-    else
-    {
-        set1 = [[LineChartDataSet alloc] initWithEntries:yVals1 label:@"DataSet 1"];
-        set1.mode = LineChartModeCubicBezier;
-        set1.cubicIntensity = 0.2;
-        set1.drawCirclesEnabled = NO;
-        set1.lineWidth = 1.8;
-        set1.circleRadius = 4.0;
-        [set1 setCircleColor:UIColor.whiteColor];
-        set1.highlightColor = [UIColor colorWithRed:244/255.f green:117/255.f blue:117/255.f alpha:1.f];
-        [set1 setColor:UIColor.whiteColor];
-        set1.fillColor = UIColor.whiteColor;
-        set1.fillAlpha = 1.f;
-        set1.drawHorizontalHighlightIndicatorEnabled = NO;
-        set1.fillFormatter = [[CubicLineSampleFillFormatter alloc] init];
-        
-        LineChartData *data = [[LineChartData alloc] initWithDataSet:set1];
-        [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:9.f]];
-        [data setDrawValues:NO];
-        
-        _chartView.data = data;
-    }
-}
+
 -(void)didQppEnableConfirmForAppRsp : (NSNotification *)_noti
 {
     NSDictionary *dictInfo=[_noti object];
@@ -685,7 +577,7 @@ volatile int initialcount = 0;
  */
 -(void)bleDidConnectPeripheral : (CBPeripheral *)aPeripheral{
     NSLog(@"line : %d, func: %s ",__LINE__, __func__);
-    scanDisconnectItem.title = @"Disconnect";
+    
     if(aPeripheral == devInfo.qppPeri)
     {
         [qppApi  qppEnable : devInfo.qppPeri
@@ -702,8 +594,7 @@ volatile int initialcount = 0;
 }
 
 -(void)bleDidDisconnectPeripheral : (CBPeripheral *)aPeripheral error : (NSError *)error{
-     NSLog(@"device disconnectecd");
-     scanDisconnectItem.title = @"Scan";
+    /// NSLog(@"%s",__func__);
     qppCentState = QPP_CENT_IDLE;
     
     [self qppStopDidConnDevTimeout];
@@ -750,7 +641,8 @@ volatile int initialcount = 0;
     {
         flagOnePeriScanned = TRUE;
         
-            
+       
+        
         /// [self presentModalViewController : deviceVC animated:YES ];
         DeviceViewController *deviceVC = [[DeviceViewController alloc]init];
         [self presentViewController: deviceVC animated:YES completion:nil];
@@ -761,92 +653,24 @@ volatile int initialcount = 0;
 - (void)didQppReceiveData : (CBPeripheral *) aPeripheral
              withCharUUID : (CBUUID *)qppUUIDForNotifyChar
                  withData : (NSData *)data{
-                          
-                   
-                     NSDate *endDate = [NSDate date];
-                     
-                  // Way 2
-                    NSTimeInterval timeDifference = [endDate timeIntervalSinceDate:refDate];
-
-                   // double minutes = timeDifference / 60;
-                   // double hours = minutes / 60;
-                    double seconds = timeDifference;
-                   // double days = minutes / 1440;
-
-                   // NSLog(@" days = %.0f,hours = %.2f, minutes = %.0f,seconds = %.0f", days, hours, minutes, seconds);
-
-                   if (seconds >= 1){
-                      //  NSLog(@"End Date is grater");
-
-                     pauseGraph = NO;
-                     scanDisconnectItem.tag = 0;
-                     scanDisconnectItem.title = @"Disconnect";
-                   
-                     const unsigned char *value = data.bytes;
-                     
-                   
-                     
-                     for (int i=0; i<data.length; i++) {
-                         //[buf appendFormat:@" %02lx",(unsigned long)value[i]];
-                         NSString *hexString = [NSString stringWithFormat:@" %02lx",(unsigned long)value[i]];
-                         unsigned result = 0;
-                         NSScanner *scanner = [NSScanner scannerWithString:hexString];
-                         [scanner setScanLocation:0];
-                         [scanner scanHexInt:&result];
-                        // NSLog(@"qpp float %d",result);
-                         //[self setDataCount:result range:result];
-                         
-                           [self.ArrayOfValues1 removeObjectAtIndex:0];
-                         
-                        // [self.ArrayOfValuesBase addObject:[NSNumber numberWithInteger:result]];
-                         [self.ArrayOfValues1 addObject:[NSNumber numberWithInteger:result]];
-
-                         
-                     
-                     }
-                    // _RespGraph.delegate = self;
-                    // [_RespGraph reloadGraph];
-                    
-                       #if QPP_LOG_FILE
-                           // write data to log file
-                           [writeBuf appendBytes:[data bytes] length:20 ];
-                       #endif
-                             refDate = [NSDate date];
-                       [qppApi qppEnableNotify : devInfo.qppPeri
-                                   withNtfChar : devInfo.aQppNtfChar
-                                    withEnable : YES];
-                       
-                       [self setDataCount];
-                     }
-
-                 }
-
-
-/*{
          
-  
-    NSDate *endDate = [NSDate date];
-    
- // Way 2
-   NSTimeInterval timeDifference = [endDate timeIntervalSinceDate:refDate];
-
-  // double minutes = timeDifference / 60;
-  // double hours = minutes / 60;
-   double seconds = timeDifference;
-  // double days = minutes / 1440;
-
-  // NSLog(@" days = %.0f,hours = %.2f, minutes = %.0f,seconds = %.0f", days, hours, minutes, seconds);
-
-  //  if (seconds >= 0.45){
-     //  NSLog(@"End Date is grater");
-
+    uint16_t length = data.length;
+ 
     pauseGraph = NO;
-    scanDisconnectItem.tag = 0;
-    scanDisconnectItem.title = @"Disconnect";
-  
-    const unsigned char *value = data.bytes;
     
-  
+    NSUInteger capacity = data.length;
+    NSMutableString *sbuf = [NSMutableString stringWithCapacity:capacity];
+    const unsigned char *buf = data.bytes;
+    NSInteger i;
+
+    for (int i=0; i<data.length; i++) {
+        [sbuf appendFormat:@"%02X",(NSUInteger)buf[i]];
+    }
+    
+    NSLog(@"qpp data %@",sbuf);
+    
+    
+    const unsigned char *value = data.bytes;
     
     for (int i=0; i<data.length; i++) {
         //[buf appendFormat:@" %02lx",(unsigned long)value[i]];
@@ -855,32 +679,43 @@ volatile int initialcount = 0;
         NSScanner *scanner = [NSScanner scannerWithString:hexString];
         [scanner setScanLocation:0];
         [scanner scanHexInt:&result];
-       // NSLog(@"qpp float %d",result);
-        //[self setDataCount:result range:result];
-        
+        NSLog(@"qpp float %d",result);
           [self.ArrayOfValues1 removeObjectAtIndex:0];
-        
        // [self.ArrayOfValuesBase addObject:[NSNumber numberWithInteger:result]];
         [self.ArrayOfValues1 addObject:[NSNumber numberWithInteger:result]];
 
-        
-    
+        /*
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            //Background Thread
+            NSError *error;
+            NSString *filepath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)firstObject] stringByAppendingPathComponent:fileNameString];
+            
+            NSString *str = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
+            // NSLog(@"ecg %@",str);
+            NSString *valueString = [NSString stringWithFormat:@"%u",result];
+            NSString *writeString = [NSString stringWithFormat:@"%@\nLinear::%@",str,valueString];
+            [self writeDataTxtFile:writeString];
+        });
+         */
     }
-   // _RespGraph.delegate = self;
-   // [_RespGraph reloadGraph];
-   
+          //_RespGraph.delegate = self;
+        //  [self.RespGraph reloadGraph];
+    
+    // writing data into txt file // fileName string respresents txt file title
+          
       #if QPP_LOG_FILE
           // write data to log file
           [writeBuf appendBytes:[data bytes] length:20 ];
       #endif
-            refDate = [NSDate date];
-  //  }
- /*   NSDate * date = [NSDate date];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"HH:mm:ss"];
-    NSString *currentTime = [dateFormatter stringFromDate:date];
-    NSLog(@"current time is:%@",currentTime); */
-//}
+          
+    //  NSLog(@"qpp data %@",qppData);
+      //   [self qppDataRateAveragedReset];
+       // [qppApi qppEnableNotify : devInfo.qppPeri
+       //             withNtfChar : devInfo.aQppNtfChar
+        //             withEnable : YES];
+       // [self readQpp];
+  
+}
 
 -(void)writeDataTxtFile:(NSString*)inputString{
   
@@ -1247,31 +1082,28 @@ volatile int initialcount = 0;
     [self.view endEditing:YES];
 }
 
-- (IBAction)qppDataSend:(id)sender{
-
+- (IBAction)qppDataSend:(id)sender {
     
-    // use UIAlertController
-    UIAlertController *alert= [UIAlertController
-                               alertControllerWithTitle:@"QPP Input"
-                               message:nil
-                               preferredStyle:UIAlertControllerStyleAlert];
+ 
+    [self refreshData2BeSent:devInfo];
     
-    UIAlertAction* ok = [UIAlertAction actionWithTitle:@"Send" style:UIAlertActionStyleDefault
-                                               handler:^(UIAlertAction * action){
-        //Do Some action here
-        UITextField *textField = alert.textFields[0];
-        NSLog(@"text was %@", textField.text);
-        
-        
-        if(devInfo.fQppEnableStatus == FALSE){
-            NSLog(@"qppEnable failed!!!");
-        }
-        else
+    if(devInfo.fQppEnableStatus == FALSE){
+        NSLog(@"qppEnable failed!!!");
+    }
+    else
+    {
+//        if(qppCentState == QPP_CENT_SENDING)
+//        {
+//            [self qppSendReset];
+//        }
+//        else
         {
-            
             qppCentState = QPP_CENT_SENDING;
             
-            NSString *strEdited = textField.text;
+
+            NSString *strEdited = _dataSendTextField.text;
+
+           
             
             if(fEdited){
                 NSData *inData=[[Utils sharedInst] hexStrToBytes : strEdited withStrMin:TEXT_EDITED_LENGTH_MIN withStrMax: [strEdited length]];
@@ -1283,18 +1115,18 @@ volatile int initialcount = 0;
             {
                 /// illegal input
                 CustomAlertView *inputAlert = [[CustomAlertView alloc]
-                                               initWithTitle : ALERT_INPUT_ERROR_TITLE
-                                               message : @"Input error!"
-                                               delegate : nil
-                                               cancelButtonTitle : nil
-                                               otherButtonTitles : @"OK", nil];
+                                            initWithTitle : ALERT_INPUT_ERROR_TITLE
+                                                  message : @"Input error!"
+                                                 delegate : nil
+                                        cancelButtonTitle : nil
+                                        otherButtonTitles : @"OK", nil];
                 [inputAlert show];
                 
                 return;
             }
-            
-            NSString *command = textField.text;
-            
+ 
+            NSString *command = _dataSendTextField.text;
+
             command = [command stringByReplacingOccurrencesOfString:@" " withString:@""];
             NSMutableData *commandToSend= [[NSMutableData alloc] init];
             unsigned char whole_byte;
@@ -1308,147 +1140,23 @@ volatile int initialcount = 0;
             }
             NSLog(@"%@", commandToSend);
             pauseGraph = YES;
-            // [_RespGraph reloadGraph];
+            [_RespGraph reloadGraph];
             [qppApi qppSendData : devInfo.qppPeri
-                       withData : commandToSend
-                       withType : CBCharacteristicWriteWithoutResponse/* CBCharacteristicWriteWithResponse */];
-            
-            qppCentState = QPP_CENT_IDLE;
+                                withData : commandToSend
+                                withType : CBCharacteristicWriteWithoutResponse/* CBCharacteristicWriteWithResponse */];
+                     
+                     qppCentState = QPP_CENT_IDLE;
             [self readQpp];
             
             
+//            if(devInfo.fQppWrRepeat){
+//                repeatWrTimer= [NSTimer scheduledTimerWithTimeInterval:devInfo.intervalBtwPkg target:self selector:@selector(didRepeatWrData:) userInfo:devInfo repeats:YES];
+//            }
         }
-        
-        
-    }];
-    UIAlertAction* cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
-                                                   handler:^(UIAlertAction * action) {
-        
-        NSLog(@"cancel btn");
-        
-        [alert dismissViewControllerAnimated:YES completion:nil];
-        
-    }];
-    
-    [alert addAction:ok];
-    [alert addAction:cancel];
-    
-    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"Input";
-        textField.keyboardType = UIKeyboardTypeDefault;
-    }];
-    
-    [self presentViewController:alert animated:YES completion:nil];
-    
-    [self refreshData2BeSent:devInfo];
-    
+    }
 }
 
-
-/*{
-    
-    sendValue++;
-    
-    // use UIAlertController
-    UIAlertController *alert= [UIAlertController
-                               alertControllerWithTitle:@"QPP Input"
-                               message:nil
-                               preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction* ok = [UIAlertAction actionWithTitle:@"Send" style:UIAlertActionStyleDefault
-                                               handler:^(UIAlertAction * action){
-        //Do Some action here
-        UITextField *textField = alert.textFields[0];
-        NSLog(@"text was %@", textField.text);
-        
-        
-        if(devInfo.fQppEnableStatus == FALSE){
-            NSLog(@"qppEnable failed!!!");
-        }
-        else
-        {
-            
-            qppCentState = QPP_CENT_SENDING;
-            
-            NSString *strEdited = textField.text;
-            
-            if(fEdited){
-                NSData *inData=[[Utils sharedInst] hexStrToBytes : strEdited withStrMin:TEXT_EDITED_LENGTH_MIN withStrMax: [strEdited length]];
-                
-                devInfo.data2Send=[[NSMutableData alloc] initWithData:inData];
-            }
-            
-            if(devInfo.data2Send == NULL)
-            {
-                /// illegal input
-                CustomAlertView *inputAlert = [[CustomAlertView alloc]
-                                               initWithTitle : ALERT_INPUT_ERROR_TITLE
-                                               message : @"Input error!"
-                                               delegate : nil
-                                               cancelButtonTitle : nil
-                                               otherButtonTitles : @"OK", nil];
-                [inputAlert show];
-                
-                return;
-            }
-            
-            NSString *command = textField.text;
-            
-            command = [command stringByReplacingOccurrencesOfString:@" " withString:@""];
-            NSMutableData *commandToSend= [[NSMutableData alloc] init];
-            unsigned char whole_byte;
-            char byte_chars[3] = {'\0','\0','\0'};
-            int i;
-            for (i=0; i < [command length]/2; i++) {
-                byte_chars[0] = [command characterAtIndex:i*2];
-                byte_chars[1] = [command characterAtIndex:i*2+1];
-                whole_byte = strtol(byte_chars, NULL, 16);
-                [commandToSend appendBytes:&whole_byte length:1];
-            }
-            NSLog(@"%@", commandToSend);
-            pauseGraph = YES;
-            // [_RespGraph reloadGraph];
-            [qppApi qppSendData : devInfo.qppPeri
-                       withData : commandToSend
-                       withType : CBCharacteristicWriteWithoutResponse/* CBCharacteristicWriteWithResponse *//*];
-            
-            qppCentState = QPP_CENT_IDLE;
-            [self readQpp];
-            
-            
-        }
-        
-        
-    }];
-    UIAlertAction* cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
-                                                   handler:^(UIAlertAction * action) {
-        
-        NSLog(@"cancel btn");
-        
-        [alert dismissViewControllerAnimated:YES completion:nil];
-        
-    }];
-    
-    [alert addAction:ok];
-    [alert addAction:cancel];
-    
-    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-        textField.placeholder = @"Input";
-        textField.keyboardType = UIKeyboardTypeDefault;
-    }];
-    
-    [self presentViewController:alert animated:YES completion:nil];
-    
-    [self refreshData2BeSent:devInfo];
-    
-}
-*/
 - (void)refreshConnectBtns {
-    //NEW CODE
-    
-    
-    
-    
     BOOL isConnected = [bleDevMonitor sharedInstance].isConnected;
     
     NSLog(@"\n func : %s\n", __func__);
@@ -1522,15 +1230,7 @@ volatile int initialcount = 0;
 - (void)bleDevMonitor:(bleDevMonitor *)client didUpdateReceivedData:(NSData *)data
 {
     uint16_t length = data.length;
-    
-    NSMutableString *buf = [NSMutableString stringWithCapacity:100];
-    const unsigned char *value = data.bytes;
-    
-    for (int i=0; i<data.length; i++) {
-        [buf appendFormat:@" %02lx",(unsigned long)value[i]];
-    }
-    NSLog(@"hexOp old  %@",buf);
-    
+   
 #if QPP_DATA_CHECK
     // check the received data
     const uint8_t *reportData = [data bytes];
@@ -1636,7 +1336,6 @@ volatile int initialcount = 0;
         double CenterTap;
         double CenterTap1; /// first derivative
                 
-               // NSLog(@"Old number I :: %d",number);
         
         while(i<([data length]/2))
         {
@@ -1849,14 +1548,23 @@ volatile int initialcount = 0;
         
         
     }
-    //_RespGraph.delegate = self;
     
     
-  //  [self.RespGraph reloadGraph];
+    
+    //_myGraph.delegate = self;
+   // _RespGraph.delegate = self;
+    
+    //[self.myGraph reloadGraph];
+    [self.RespGraph reloadGraph];
 #if QPP_LOG_FILE
     // write data to log file
     [writeBuf appendBytes:[data bytes] length:20 ];
 #endif
+    
+    bleDevMonitor *dev = [bleDevMonitor sharedInstance];
+     [dev stopScan];
+     
+     [self voleStartDidConnActInd];
     
 }
 
@@ -2105,5 +1813,6 @@ volatile int initialcount = 0;
 }
 
 @end
+
 
 

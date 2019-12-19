@@ -7,15 +7,41 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7414F44D23995BDC00DFD8E8 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7414F44B23995BDC00DFD8E8 /* HomeViewController.m */; };
+		7414F44E23995BDC00DFD8E8 /* HomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7414F44C23995BDC00DFD8E8 /* HomeViewController.xib */; };
 		74426963236349FD0030A6D2 /* qppApiCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 74426960236349FD0030A6D2 /* qppApiCtrl.m */; };
 		74426964236349FD0030A6D2 /* QppApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 74426962236349FD0030A6D2 /* QppApi.m */; };
-		7442696823634D1A0030A6D2 /* QBleClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 7442696723634D1A0030A6D2 /* QBleClient.m */; };
 		7442696B23649ABE0030A6D2 /* DevicesCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7442696A23649ABE0030A6D2 /* DevicesCtrl.m */; };
 		744269762365F2DF0030A6D2 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 744269752365F2DF0030A6D2 /* Utils.m */; };
 		7442697A2365F4AC0030A6D2 /* DeviceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 744269772365F4AC0030A6D2 /* DeviceViewController.m */; };
 		7442697B2365F4AC0030A6D2 /* DeviceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 744269782365F4AC0030A6D2 /* DeviceViewController.xib */; };
-		74588DCE236C9F5500FCA60D /* QBlueVoLEViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 74588DCC236C9F5500FCA60D /* QBlueVoLEViewController.m */; };
-		74588DCF236C9F5500FCA60D /* QBlueVoLEViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 74588DCD236C9F5500FCA60D /* QBlueVoLEViewController.xib */; };
+		7448675F238AB60D00CCBFD2 /* OTAViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7448675D238AB60D00CCBFD2 /* OTAViewController.m */; };
+		74486760238AB60D00CCBFD2 /* OTAViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7448675E238AB60D00CCBFD2 /* OTAViewController.xib */; };
+		74486763238AB68E00CCBFD2 /* libQBlueOta.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 74486762238AB68E00CCBFD2 /* libQBlueOta.a */; };
+		74486767238AB71500CCBFD2 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 74486764238AB71500CCBFD2 /* RootViewController.m */; };
+		74486768238AB71500CCBFD2 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 74486766238AB71500CCBFD2 /* RootViewController.xib */; };
+		7448676B238AB74C00CCBFD2 /* qnLoadFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 7448676A238AB74C00CCBFD2 /* qnLoadFile.m */; };
+		7448676E238AB76100CCBFD2 /* QnAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7448676D238AB76100CCBFD2 /* QnAlertView.m */; };
+		74486772238AB79200CCBFD2 /* FwFileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7448676F238AB79200CCBFD2 /* FwFileViewController.m */; };
+		74486773238AB79200CCBFD2 /* FwFileViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 74486771238AB79200CCBFD2 /* FwFileViewController.xib */; };
+		749DE1112380666900B5F3E3 /* QBlueClient.h in Sources */ = {isa = PBXBuildFile; fileRef = CFF12C6E185B0E480092E95D /* QBlueClient.h */; };
+		749DE12F23806E6000B5F3E3 /* QBleClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 749DE12D23806E6000B5F3E3 /* QBleClient.m */; };
+		749DE13423806F1D00B5F3E3 /* QBlueVoLEViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 749DE13323806F1D00B5F3E3 /* QBlueVoLEViewController.xib */; };
+		74A0239D23A7F0D7005D6B74 /* UIColor+Nordic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A0239823A7F0D6005D6B74 /* UIColor+Nordic.swift */; };
+		74A0239E23A7F0D7005D6B74 /* AppUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A0239923A7F0D7005D6B74 /* AppUtilities.swift */; };
+		74A0239F23A7F0D7005D6B74 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A0239A23A7F0D7005D6B74 /* Data.swift */; };
+		74A023A023A7F0D7005D6B74 /* CharacteristicReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A0239B23A7F0D7005D6B74 /* CharacteristicReader.swift */; };
+		74A023A123A7F0D7005D6B74 /* ServiceIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A0239C23A7F0D7005D6B74 /* ServiceIdentifiers.swift */; };
+		74A023A323A7F1D3005D6B74 /* ScannerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A023A223A7F1D3005D6B74 /* ScannerDelegate.swift */; };
+		74A023A523A7F23A005D6B74 /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A023A423A7F23A005D6B74 /* ScannerViewController.swift */; };
+		74A023A723A7F260005D6B74 /* ScannedPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A023A623A7F260005D6B74 /* ScannedPeripheral.swift */; };
+		74A023B423A93507005D6B74 /* HRMViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A023B223A93507005D6B74 /* HRMViewController.swift */; };
+		74A023B523A93507005D6B74 /* HRMViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 74A023B323A93507005D6B74 /* HRMViewController.xib */; };
+		74A1650D2389097700A7C32B /* QBlueVoLEViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 74A1650C2389097700A7C32B /* QBlueVoLEViewController.m */; };
+		74C4F0C723823DBF00F3A1D4 /* SwiftViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74C4F0C623823DBF00F3A1D4 /* SwiftViewController.swift */; };
+		74C8F37B239694CC00F9E0EE /* QbleQppClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 74C8F37A239694CC00F9E0EE /* QbleQppClient.m */; };
+		74C8F3842396BA3D00F9E0EE /* DevicesQppViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 74C8F3812396BA3D00F9E0EE /* DevicesQppViewController.xib */; };
+		74C8F3852396BA3D00F9E0EE /* DevicesQppViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 74C8F3822396BA3D00F9E0EE /* DevicesQppViewController.m */; };
 		7771B9D21981AEF4008C77F0 /* logo152x152.png in Resources */ = {isa = PBXBuildFile; fileRef = 7771B9D11981AEF4008C77F0 /* logo152x152.png */; };
 		7771B9D41981B166008C77F0 /* logo76x76.png in Resources */ = {isa = PBXBuildFile; fileRef = 7771B9D31981B166008C77F0 /* logo76x76.png */; };
 		7771B9D61981B1B4008C77F0 /* logo40x40.png in Resources */ = {isa = PBXBuildFile; fileRef = 7771B9D51981B1B4008C77F0 /* logo40x40.png */; };
@@ -23,8 +49,8 @@
 		7771B9DA1981B20E008C77F0 /* logo29x29.png in Resources */ = {isa = PBXBuildFile; fileRef = 7771B9D91981B20E008C77F0 /* logo29x29.png */; };
 		7771B9DC1981B212008C77F0 /* logo58x58.png in Resources */ = {isa = PBXBuildFile; fileRef = 7771B9DB1981B212008C77F0 /* logo58x58.png */; };
 		77767BD21C24F00A008CA39E /* ecg.txt in Resources */ = {isa = PBXBuildFile; fileRef = 77767BD11C24F00A008CA39E /* ecg.txt */; };
-		7798F9321940EA770091463F /* GraphView2.m in Sources */ = {isa = PBXBuildFile; fileRef = 7798F9311940EA770091463F /* GraphView2.m */; };
 		77FC259A194B68260002F4D1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77FC2599194B68260002F4D1 /* Images.xcassets */; };
+		A3BC506553AB4373DF4C4986 /* Pods_VoLE_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E106E615AEF75A921B5C2144 /* Pods_VoLE_Demo.framework */; };
 		B0405EAD18BB2E8300DCE148 /* VoLE Demo-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B0405EAC18BB2E8300DCE148 /* VoLE Demo-Info.plist */; };
 		B0405EB018BB2F9C00DCE148 /* QBlueVoLEAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B0405EAF18BB2F9C00DCE148 /* QBlueVoLEAppDelegate.m */; };
 		B0405EB218BB303600DCE148 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = B0405EB118BB303600DCE148 /* MainWindow.xib */; };
@@ -70,7 +96,6 @@
 		CFF12CB2185B0F6A0092E95D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CFF12CB0185B0F6A0092E95D /* main.m */; };
 		CFF12CB8185B12FB0092E95D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFF12CB7185B12FB0092E95D /* QuartzCore.framework */; };
 		D509E0FB18CEBC5D001FA6B2 /* LinearDimensionsLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = D509E0FA18CEBC5D001FA6B2 /* LinearDimensionsLogo.png */; };
-		D509E10618CEC4FC001FA6B2 /* GraphView1.m in Sources */ = {isa = PBXBuildFile; fileRef = D509E10518CEC4FC001FA6B2 /* GraphView1.m */; };
 		F07370D3177AC233003CEA97 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F07370D2177AC233003CEA97 /* UIKit.framework */; };
 		F07370D5177AC242003CEA97 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F07370D4177AC242003CEA97 /* CoreBluetooth.framework */; };
 /* End PBXBuildFile section */
@@ -80,12 +105,13 @@
 		44B0264A13F5D44000541EA5 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		44B0264D13F5D44000541EA5 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		44B0264E13F5D44000541EA5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		7414F44A23995BDC00DFD8E8 /* HomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
+		7414F44B23995BDC00DFD8E8 /* HomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
+		7414F44C23995BDC00DFD8E8 /* HomeViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HomeViewController.xib; sourceTree = "<group>"; };
 		7442695F236349FD0030A6D2 /* QppApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QppApi.h; sourceTree = "<group>"; };
 		74426960236349FD0030A6D2 /* qppApiCtrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = qppApiCtrl.m; sourceTree = "<group>"; };
 		74426961236349FD0030A6D2 /* qppApiCtrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qppApiCtrl.h; sourceTree = "<group>"; };
 		74426962236349FD0030A6D2 /* QppApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QppApi.m; sourceTree = "<group>"; };
-		7442696623634D1A0030A6D2 /* QBleClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QBleClient.h; sourceTree = "<group>"; };
-		7442696723634D1A0030A6D2 /* QBleClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QBleClient.m; sourceTree = "<group>"; };
 		7442696923649ABE0030A6D2 /* DevicesCtrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DevicesCtrl.h; sourceTree = "<group>"; };
 		7442696A23649ABE0030A6D2 /* DevicesCtrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DevicesCtrl.m; sourceTree = "<group>"; };
 		7442696C2365EEB50030A6D2 /* QppPublic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QppPublic.h; sourceTree = "<group>"; };
@@ -94,9 +120,44 @@
 		744269772365F4AC0030A6D2 /* DeviceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceViewController.m; sourceTree = "<group>"; };
 		744269782365F4AC0030A6D2 /* DeviceViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DeviceViewController.xib; sourceTree = "<group>"; };
 		744269792365F4AC0030A6D2 /* DeviceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceViewController.h; sourceTree = "<group>"; };
-		74588DCB236C9F5500FCA60D /* QBlueVoLEViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = QBlueVoLEViewController.h; path = "../../../../../.Trash/untitled folder/QBlueVoLEViewController.h"; sourceTree = "<group>"; };
-		74588DCC236C9F5500FCA60D /* QBlueVoLEViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = QBlueVoLEViewController.m; path = "../../../../../.Trash/untitled folder/QBlueVoLEViewController.m"; sourceTree = "<group>"; };
-		74588DCD236C9F5500FCA60D /* QBlueVoLEViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = QBlueVoLEViewController.xib; sourceTree = "<group>"; };
+		7448675C238AB60D00CCBFD2 /* OTAViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OTAViewController.h; sourceTree = "<group>"; };
+		7448675D238AB60D00CCBFD2 /* OTAViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OTAViewController.m; sourceTree = "<group>"; };
+		7448675E238AB60D00CCBFD2 /* OTAViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OTAViewController.xib; sourceTree = "<group>"; };
+		74486761238AB68E00CCBFD2 /* OtaApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OtaApi.h; sourceTree = "<group>"; };
+		74486762238AB68E00CCBFD2 /* libQBlueOta.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libQBlueOta.a; sourceTree = "<group>"; };
+		74486764238AB71500CCBFD2 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		74486765238AB71500CCBFD2 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		74486766238AB71500CCBFD2 /* RootViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
+		74486769238AB74C00CCBFD2 /* qnLoadFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qnLoadFile.h; sourceTree = "<group>"; };
+		7448676A238AB74C00CCBFD2 /* qnLoadFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = qnLoadFile.m; sourceTree = "<group>"; };
+		7448676C238AB76100CCBFD2 /* QnAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QnAlertView.h; sourceTree = "<group>"; };
+		7448676D238AB76100CCBFD2 /* QnAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QnAlertView.m; sourceTree = "<group>"; };
+		7448676F238AB79200CCBFD2 /* FwFileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FwFileViewController.m; sourceTree = "<group>"; };
+		74486770238AB79200CCBFD2 /* FwFileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FwFileViewController.h; sourceTree = "<group>"; };
+		74486771238AB79200CCBFD2 /* FwFileViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FwFileViewController.xib; sourceTree = "<group>"; };
+		74486774238AB7C400CCBFD2 /* OtaAppPublic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OtaAppPublic.h; sourceTree = "<group>"; };
+		749DE12D23806E6000B5F3E3 /* QBleClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QBleClient.m; sourceTree = "<group>"; };
+		749DE12E23806E6000B5F3E3 /* QBleClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QBleClient.h; sourceTree = "<group>"; };
+		749DE13023806E9500B5F3E3 /* QBlueVoLEViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QBlueVoLEViewController.h; sourceTree = "<group>"; };
+		749DE13323806F1D00B5F3E3 /* QBlueVoLEViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = QBlueVoLEViewController.xib; sourceTree = "<group>"; };
+		74A0239823A7F0D6005D6B74 /* UIColor+Nordic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Nordic.swift"; sourceTree = "<group>"; };
+		74A0239923A7F0D7005D6B74 /* AppUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppUtilities.swift; sourceTree = "<group>"; };
+		74A0239A23A7F0D7005D6B74 /* Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		74A0239B23A7F0D7005D6B74 /* CharacteristicReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacteristicReader.swift; sourceTree = "<group>"; };
+		74A0239C23A7F0D7005D6B74 /* ServiceIdentifiers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceIdentifiers.swift; sourceTree = "<group>"; };
+		74A023A223A7F1D3005D6B74 /* ScannerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScannerDelegate.swift; sourceTree = "<group>"; };
+		74A023A423A7F23A005D6B74 /* ScannerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
+		74A023A623A7F260005D6B74 /* ScannedPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScannedPeripheral.swift; sourceTree = "<group>"; };
+		74A023B223A93507005D6B74 /* HRMViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HRMViewController.swift; sourceTree = "<group>"; };
+		74A023B323A93507005D6B74 /* HRMViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HRMViewController.xib; sourceTree = "<group>"; };
+		74A1650C2389097700A7C32B /* QBlueVoLEViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QBlueVoLEViewController.m; sourceTree = "<group>"; };
+		74C4F0C523823DBF00F3A1D4 /* VoLE Demo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "VoLE Demo-Bridging-Header.h"; sourceTree = "<group>"; };
+		74C4F0C623823DBF00F3A1D4 /* SwiftViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftViewController.swift; sourceTree = "<group>"; };
+		74C8F379239694CC00F9E0EE /* QbleQppClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QbleQppClient.h; sourceTree = "<group>"; };
+		74C8F37A239694CC00F9E0EE /* QbleQppClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QbleQppClient.m; sourceTree = "<group>"; };
+		74C8F3812396BA3D00F9E0EE /* DevicesQppViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DevicesQppViewController.xib; sourceTree = "<group>"; };
+		74C8F3822396BA3D00F9E0EE /* DevicesQppViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DevicesQppViewController.m; sourceTree = "<group>"; };
+		74C8F3832396BA3D00F9E0EE /* DevicesQppViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DevicesQppViewController.h; sourceTree = "<group>"; };
 		76445A4B166E505300C529E9 /* Extract.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Extract.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7771B9D11981AEF4008C77F0 /* logo152x152.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo152x152.png; sourceTree = "<group>"; };
 		7771B9D31981B166008C77F0 /* logo76x76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo76x76.png; sourceTree = "<group>"; };
@@ -105,11 +166,9 @@
 		7771B9D91981B20E008C77F0 /* logo29x29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo29x29.png; sourceTree = "<group>"; };
 		7771B9DB1981B212008C77F0 /* logo58x58.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo58x58.png; sourceTree = "<group>"; };
 		77767BD11C24F00A008CA39E /* ecg.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ecg.txt; sourceTree = "<group>"; };
-		7798F92F1940E99C0091463F /* GraphViewDelegate2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GraphViewDelegate2.h; sourceTree = "<group>"; };
-		7798F9301940EA770091463F /* GraphView2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphView2.h; sourceTree = "<group>"; };
-		7798F9311940EA770091463F /* GraphView2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GraphView2.m; sourceTree = "<group>"; };
 		77A0BEBC1C7E269100D47101 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		77FC2599194B68260002F4D1 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "VoLE Demo/Images.xcassets"; sourceTree = "<group>"; };
+		8C42BE7CDFAD75723E60CEBB /* Pods-VoLE Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoLE Demo.release.xcconfig"; path = "Target Support Files/Pods-VoLE Demo/Pods-VoLE Demo.release.xcconfig"; sourceTree = "<group>"; };
 		B0405EAC18BB2E8300DCE148 /* VoLE Demo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "VoLE Demo-Info.plist"; path = "Src/SupportingFiles/VoLE Demo-Info.plist"; sourceTree = SOURCE_ROOT; };
 		B0405EAE18BB2F9C00DCE148 /* QBlueVoLEAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QBlueVoLEAppDelegate.h; sourceTree = "<group>"; };
 		B0405EAF18BB2F9C00DCE148 /* QBlueVoLEAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QBlueVoLEAppDelegate.m; sourceTree = "<group>"; };
@@ -161,11 +220,10 @@
 		CFF12CB0185B0F6A0092E95D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Src/SupportingFiles/main.m; sourceTree = SOURCE_ROOT; };
 		CFF12CB7185B12FB0092E95D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		D509E0FA18CEBC5D001FA6B2 /* LinearDimensionsLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LinearDimensionsLogo.png; sourceTree = "<group>"; };
-		D509E10418CEC4FC001FA6B2 /* GraphView1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphView1.h; sourceTree = "<group>"; };
-		D509E10518CEC4FC001FA6B2 /* GraphView1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GraphView1.m; sourceTree = "<group>"; };
-		D509E10718CEC5B4001FA6B2 /* GraphViewDelegate1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GraphViewDelegate1.h; sourceTree = "<group>"; };
+		E106E615AEF75A921B5C2144 /* Pods_VoLE_Demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VoLE_Demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F07370D2177AC233003CEA97 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		F07370D4177AC242003CEA97 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/System/Library/Frameworks/CoreBluetooth.framework; sourceTree = DEVELOPER_DIR; };
+		FB050C3CB5C79D151D3CB339 /* Pods-VoLE Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VoLE Demo.debug.xcconfig"; path = "Target Support Files/Pods-VoLE Demo/Pods-VoLE Demo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +231,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74486763238AB68E00CCBFD2 /* libQBlueOta.a in Frameworks */,
 				CF576482185ED015003A36EE /* SystemConfiguration.framework in Frameworks */,
 				CFC1BE4F185DD71200C54512 /* Foundation.framework in Frameworks */,
 				CF6D44D5185C535300AC1F78 /* MediaPlayer.framework in Frameworks */,
@@ -183,6 +242,7 @@
 				CFEA1B7617CEF14C00AF15AA /* CFNetwork.framework in Frameworks */,
 				F07370D5177AC242003CEA97 /* CoreBluetooth.framework in Frameworks */,
 				F07370D3177AC233003CEA97 /* UIKit.framework in Frameworks */,
+				A3BC506553AB4373DF4C4986 /* Pods_VoLE_Demo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,6 +255,8 @@
 				77767BD11C24F00A008CA39E /* ecg.txt */,
 				77FC2599194B68260002F4D1 /* Images.xcassets */,
 				CFA007361862D5D1007FF5A8 /* Default.png */,
+				74486762238AB68E00CCBFD2 /* libQBlueOta.a */,
+				74486761238AB68E00CCBFD2 /* OtaApi.h */,
 				CF2641FF185B219D00EC0995 /* Res */,
 				CFF12C6D185B0E480092E95D /* BLE */,
 				CFF12C70185B0E480092E95D /* CustomAlertView */,
@@ -203,6 +265,7 @@
 				76445A54166E505300C529E9 /* SupportingFiles */,
 				44B0264913F5D44000541EA5 /* Frameworks */,
 				44B0264713F5D44000541EA5 /* Products */,
+				EFECED4AC4505F1B35C2D176 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -230,6 +293,7 @@
 				449EC7C613F9A3110074C363 /* IOBluetooth.framework */,
 				44B0264A13F5D44000541EA5 /* Cocoa.framework */,
 				44B0264C13F5D44000541EA5 /* Other Frameworks */,
+				E106E615AEF75A921B5C2144 /* Pods_VoLE_Demo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -299,8 +363,6 @@
 		CFF12C6D185B0E480092E95D /* BLE */ = {
 			isa = PBXGroup;
 			children = (
-				7442696623634D1A0030A6D2 /* QBleClient.h */,
-				7442696723634D1A0030A6D2 /* QBleClient.m */,
 				CFF12C6E185B0E480092E95D /* QBlueClient.h */,
 				CFF12C6F185B0E480092E95D /* QBlueClient.m */,
 			);
@@ -363,27 +425,66 @@
 		CFF12C88185B0E480092E95D /* VoLE */ = {
 			isa = PBXGroup;
 			children = (
+				749DE12E23806E6000B5F3E3 /* QBleClient.h */,
+				749DE12D23806E6000B5F3E3 /* QBleClient.m */,
+				74C8F379239694CC00F9E0EE /* QbleQppClient.h */,
+				74C8F37A239694CC00F9E0EE /* QbleQppClient.m */,
 				744269742365F2DF0030A6D2 /* Utils.h */,
 				744269752365F2DF0030A6D2 /* Utils.m */,
 				744269792365F4AC0030A6D2 /* DeviceViewController.h */,
 				744269772365F4AC0030A6D2 /* DeviceViewController.m */,
 				744269782365F4AC0030A6D2 /* DeviceViewController.xib */,
+				74C8F3832396BA3D00F9E0EE /* DevicesQppViewController.h */,
+				74C8F3822396BA3D00F9E0EE /* DevicesQppViewController.m */,
+				74C8F3812396BA3D00F9E0EE /* DevicesQppViewController.xib */,
 				B0405EAE18BB2F9C00DCE148 /* QBlueVoLEAppDelegate.h */,
 				B0405EAF18BB2F9C00DCE148 /* QBlueVoLEAppDelegate.m */,
+				7414F44A23995BDC00DFD8E8 /* HomeViewController.h */,
+				7414F44B23995BDC00DFD8E8 /* HomeViewController.m */,
+				7414F44C23995BDC00DFD8E8 /* HomeViewController.xib */,
+				74A023B223A93507005D6B74 /* HRMViewController.swift */,
+				74A023B323A93507005D6B74 /* HRMViewController.xib */,
 				CF576465185E9886003A36EE /* QBlueDefine.h */,
-				D509E10418CEC4FC001FA6B2 /* GraphView1.h */,
-				D509E10518CEC4FC001FA6B2 /* GraphView1.m */,
-				7798F9301940EA770091463F /* GraphView2.h */,
-				7798F9311940EA770091463F /* GraphView2.m */,
-				D509E10718CEC5B4001FA6B2 /* GraphViewDelegate1.h */,
-				7798F92F1940E99C0091463F /* GraphViewDelegate2.h */,
 				77A0BEBC1C7E269100D47101 /* Constants.h */,
-				74588DCB236C9F5500FCA60D /* QBlueVoLEViewController.h */,
-				74588DCC236C9F5500FCA60D /* QBlueVoLEViewController.m */,
-				74588DCD236C9F5500FCA60D /* QBlueVoLEViewController.xib */,
+				749DE13023806E9500B5F3E3 /* QBlueVoLEViewController.h */,
+				74A1650C2389097700A7C32B /* QBlueVoLEViewController.m */,
+				749DE13323806F1D00B5F3E3 /* QBlueVoLEViewController.xib */,
+				74C4F0C623823DBF00F3A1D4 /* SwiftViewController.swift */,
+				74A0239923A7F0D7005D6B74 /* AppUtilities.swift */,
+				74A0239B23A7F0D7005D6B74 /* CharacteristicReader.swift */,
+				74A0239A23A7F0D7005D6B74 /* Data.swift */,
+				74A0239C23A7F0D7005D6B74 /* ServiceIdentifiers.swift */,
+				74A0239823A7F0D6005D6B74 /* UIColor+Nordic.swift */,
+				74A023A223A7F1D3005D6B74 /* ScannerDelegate.swift */,
+				74A023A423A7F23A005D6B74 /* ScannerViewController.swift */,
+				74A023A623A7F260005D6B74 /* ScannedPeripheral.swift */,
+				7448675C238AB60D00CCBFD2 /* OTAViewController.h */,
+				7448675D238AB60D00CCBFD2 /* OTAViewController.m */,
+				7448675E238AB60D00CCBFD2 /* OTAViewController.xib */,
+				74486765238AB71500CCBFD2 /* RootViewController.h */,
+				74486764238AB71500CCBFD2 /* RootViewController.m */,
+				74486766238AB71500CCBFD2 /* RootViewController.xib */,
+				74486769238AB74C00CCBFD2 /* qnLoadFile.h */,
+				7448676A238AB74C00CCBFD2 /* qnLoadFile.m */,
+				74486770238AB79200CCBFD2 /* FwFileViewController.h */,
+				7448676F238AB79200CCBFD2 /* FwFileViewController.m */,
+				74486771238AB79200CCBFD2 /* FwFileViewController.xib */,
+				7448676C238AB76100CCBFD2 /* QnAlertView.h */,
+				7448676D238AB76100CCBFD2 /* QnAlertView.m */,
+				74486774238AB7C400CCBFD2 /* OtaAppPublic.h */,
+				74C4F0C523823DBF00F3A1D4 /* VoLE Demo-Bridging-Header.h */,
 			);
 			name = VoLE;
 			path = Src/VoLE;
+			sourceTree = "<group>";
+		};
+		EFECED4AC4505F1B35C2D176 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				FB050C3CB5C79D151D3CB339 /* Pods-VoLE Demo.debug.xcconfig */,
+				8C42BE7CDFAD75723E60CEBB /* Pods-VoLE Demo.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -393,9 +494,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 76445A67166E505300C529E9 /* Build configuration list for PBXNativeTarget "VoLE Demo" */;
 			buildPhases = (
+				5E69F492CC6FD1F9F316DD6B /* [CP] Check Pods Manifest.lock */,
 				76445A47166E505300C529E9 /* Sources */,
 				76445A48166E505300C529E9 /* Frameworks */,
 				76445A49166E505300C529E9 /* Resources */,
+				47BDF0508C41DB0D4E501C40 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -417,6 +520,7 @@
 				TargetAttributes = {
 					76445A4A166E505300C529E9 = {
 						DevelopmentTeam = 42V3K896X5;
+						LastSwiftMigration = 1120;
 					};
 				};
 			};
@@ -443,11 +547,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74C8F3842396BA3D00F9E0EE /* DevicesQppViewController.xib in Resources */,
 				CFF12C90185B0E480092E95D /* alert-black-button.png in Resources */,
 				CFF12C91185B0E480092E95D /* alert-black-button@2x.png in Resources */,
 				CFF12C92185B0E480092E95D /* alert-gray-button.png in Resources */,
+				7414F44E23995BDC00DFD8E8 /* HomeViewController.xib in Resources */,
 				CFF12C93185B0E480092E95D /* alert-gray-button@2x.png in Resources */,
 				CFF12C94185B0E480092E95D /* alert-red-button.png in Resources */,
+				74486760238AB60D00CCBFD2 /* OTAViewController.xib in Resources */,
 				CFF12C95185B0E480092E95D /* alert-red-button@2x.png in Resources */,
 				77767BD21C24F00A008CA39E /* ecg.txt in Resources */,
 				7771B9DC1981B212008C77F0 /* logo58x58.png in Resources */,
@@ -456,6 +563,7 @@
 				CFF12C98185B0E480092E95D /* TableViewAlertBackground.png in Resources */,
 				CFF12C99185B0E480092E95D /* TableViewAlertBackground@2x.png in Resources */,
 				CFF12C9A185B0E480092E95D /* TableViewAlertButton.png in Resources */,
+				74486773238AB79200CCBFD2 /* FwFileViewController.xib in Resources */,
 				77FC259A194B68260002F4D1 /* Images.xcassets in Resources */,
 				CFF12C9B185B0E480092E95D /* TableViewAlertButton@2x.png in Resources */,
 				CFF12C9C185B0E480092E95D /* TableViewAlertButtonPressed.png in Resources */,
@@ -472,13 +580,15 @@
 				7771B9D41981B166008C77F0 /* logo76x76.png in Resources */,
 				7771B9D21981AEF4008C77F0 /* logo152x152.png in Resources */,
 				D509E0FB18CEBC5D001FA6B2 /* LinearDimensionsLogo.png in Resources */,
+				74486768238AB71500CCBFD2 /* RootViewController.xib in Resources */,
 				CF57644E185E8629003A36EE /* button.png in Resources */,
 				CF57645A185E88ED003A36EE /* buttonB.png in Resources */,
 				CF57645C185E890D003A36EE /* buttonR.png in Resources */,
-				74588DCF236C9F5500FCA60D /* QBlueVoLEViewController.xib in Resources */,
+				749DE13423806F1D00B5F3E3 /* QBlueVoLEViewController.xib in Resources */,
 				CF57645D185E9171003A36EE /* Default@2x.png in Resources */,
 				CF61D0F4186179710021EBD4 /* voleMainBg.png in Resources */,
 				CF61D0F618617A300021EBD4 /* navBar.png in Resources */,
+				74A023B523A93507005D6B74 /* HRMViewController.xib in Resources */,
 				CFA007371862D5D1007FF5A8 /* Default.png in Resources */,
 				CFA007391862D6A9007FF5A8 /* Default.png in Resources */,
 				B0405EAD18BB2E8300DCE148 /* VoLE Demo-Info.plist in Resources */,
@@ -490,24 +600,86 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		47BDF0508C41DB0D4E501C40 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-VoLE Demo/Pods-VoLE Demo-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Charts/Charts.framework",
+				"${BUILT_PRODUCTS_DIR}/CorePlot/CorePlot.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Charts.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CorePlot.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-VoLE Demo/Pods-VoLE Demo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5E69F492CC6FD1F9F316DD6B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-VoLE Demo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		76445A47166E505300C529E9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				749DE1112380666900B5F3E3 /* QBlueClient.h in Sources */,
+				749DE12F23806E6000B5F3E3 /* QBleClient.m in Sources */,
+				74486767238AB71500CCBFD2 /* RootViewController.m in Sources */,
+				74A1650D2389097700A7C32B /* QBlueVoLEViewController.m in Sources */,
+				74A023A323A7F1D3005D6B74 /* ScannerDelegate.swift in Sources */,
+				74C4F0C723823DBF00F3A1D4 /* SwiftViewController.swift in Sources */,
 				CFF12C8E185B0E480092E95D /* QBlueClient.m in Sources */,
 				CFF12C8F185B0E480092E95D /* CustomAlertView.m in Sources */,
-				74588DCE236C9F5500FCA60D /* QBlueVoLEViewController.m in Sources */,
+				74A0239E23A7F0D7005D6B74 /* AppUtilities.swift in Sources */,
+				74A0239D23A7F0D7005D6B74 /* UIColor+Nordic.swift in Sources */,
+				7448676B238AB74C00CCBFD2 /* qnLoadFile.m in Sources */,
 				CFF12CA0185B0E480092E95D /* TableViewAlert.m in Sources */,
 				7442697A2365F4AC0030A6D2 /* DeviceViewController.m in Sources */,
-				D509E10618CEC4FC001FA6B2 /* GraphView1.m in Sources */,
+				74C8F37B239694CC00F9E0EE /* QbleQppClient.m in Sources */,
+				74A023A523A7F23A005D6B74 /* ScannerViewController.swift in Sources */,
 				744269762365F2DF0030A6D2 /* Utils.m in Sources */,
+				74A023A123A7F0D7005D6B74 /* ServiceIdentifiers.swift in Sources */,
+				7448675F238AB60D00CCBFD2 /* OTAViewController.m in Sources */,
+				7448676E238AB76100CCBFD2 /* QnAlertView.m in Sources */,
+				74A023A023A7F0D7005D6B74 /* CharacteristicReader.swift in Sources */,
 				74426963236349FD0030A6D2 /* qppApiCtrl.m in Sources */,
 				CFF12CB2185B0F6A0092E95D /* main.m in Sources */,
-				7798F9321940EA770091463F /* GraphView2.m in Sources */,
 				7442696B23649ABE0030A6D2 /* DevicesCtrl.m in Sources */,
+				74A023B423A93507005D6B74 /* HRMViewController.swift in Sources */,
+				7414F44D23995BDC00DFD8E8 /* HomeViewController.m in Sources */,
+				74A023A723A7F260005D6B74 /* ScannedPeripheral.swift in Sources */,
+				74486772238AB79200CCBFD2 /* FwFileViewController.m in Sources */,
+				74C8F3852396BA3D00F9E0EE /* DevicesQppViewController.m in Sources */,
 				74426964236349FD0030A6D2 /* QppApi.m in Sources */,
-				7442696823634D1A0030A6D2 /* QBleClient.m in Sources */,
+				74A0239F23A7F0D7005D6B74 /* Data.swift in Sources */,
 				B0405EB018BB2F9C00DCE148 /* QBlueVoLEAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -549,7 +721,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "46fe6d8d-398c-4e07-a062-992fe86dd6e6";
@@ -586,7 +758,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "46fe6d8d-398c-4e07-a062-992fe86dd6e6";
@@ -598,10 +770,12 @@
 		};
 		76445A65166E505300C529E9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FB050C3CB5C79D151D3CB339 /* Pods-VoLE Demo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -609,6 +783,7 @@
 				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Distribution: LINEAR DIMENSIONS SEMICONDUCTOR INC. (3MP4835RCD)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 42V3K896X5;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
@@ -616,13 +791,33 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Src/SupportingFiles/VoLE Demo-Prefix.pch";
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Charts/Charts.framework/Headers\"",
+					$SOURCE_ROOT/include,
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/src/SupportingFiles/VoLE Demo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/LibOta",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"Charts\"",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lineardimensions.test16;
 				PRODUCT_NAME = Extract;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=*]" = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "Src/VoLE/VoLE Demo-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
@@ -631,10 +826,12 @@
 		};
 		76445A66166E505300C529E9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8C42BE7CDFAD75723E60CEBB /* Pods-VoLE Demo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -642,6 +839,7 @@
 				"CODE_SIGN_IDENTITY[sdk=*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 42V3K896X5;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
@@ -649,14 +847,33 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Src/SupportingFiles/VoLE Demo-Prefix.pch";
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Charts/Charts.framework/Headers\"",
+					$SOURCE_ROOT/include,
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/src/SupportingFiles/VoLE Demo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/LibOta",
+				);
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"Charts\"",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.lineardimensions.test16;
 				PRODUCT_NAME = Extract;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=*]" = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "Src/VoLE/VoLE Demo-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
