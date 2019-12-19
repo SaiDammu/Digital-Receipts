@@ -22,7 +22,7 @@
 //
 
 #import "QBlueVoLEAppDelegate.h"
-#import "QBlueVoLEViewController.h"
+#import "HomeViewController.h"
 
 // #import "AudioPlayerView.h"
 
@@ -40,10 +40,15 @@
         
     [self.window makeKeyAndVisible];
     
-    QBlueVoLEViewController *vc = [[QBlueVoLEViewController alloc]initWithNibName:@"QBlueVoLEViewController" bundle:[NSBundle mainBundle]];
-    UINavigationController *nc = [[UINavigationController alloc]initWithRootViewController:vc];
+    HomeViewController *hvc = [[HomeViewController alloc]initWithNibName:@"HomeViewController" bundle:[NSBundle mainBundle]];
+    UINavigationController *nvc = [[UINavigationController alloc]initWithRootViewController:hvc];
+    self.window.rootViewController = nvc;
     
-    self.window.rootViewController = nc;     
+    
+    /*
+    Homev *vc = [[QBlueVoLEViewController alloc]initWithNibName:@"QBlueVoLEViewController" bundle:[NSBundle mainBundle]];
+    UINavigationController *nc = [[UINavigationController alloc]initWithRootViewController:vc];
+    self.window.rootViewController = nc; */
 }
 
 

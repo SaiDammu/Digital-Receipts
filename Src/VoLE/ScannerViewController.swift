@@ -39,26 +39,23 @@ class ScannerViewController: UIViewController, CBCentralManagerDelegate, UITable
     var bluetoothManager : CBCentralManager?
     var delegate         : ScannerDelegate?
     var filterUUID       : CBUUID?
-    var peripherals      : [ScannedPeripheral]
+    var peripherals      : [ScannedPeripheral]!
     var timer            : Timer?
     
-    @IBOutlet weak var devicesTable: UITableView!
-    @IBOutlet weak var emptyView: UIView!
+    var devicesTable: UITableView!
+  //  weak var emptyView: UIView!
     @IBAction func cancelButtonTapped(_ sender: AnyObject) {
         self.dismiss(animated: true, completion: nil)
     }
 
     @objc func timerFire() {
         if peripherals.count > 0 {
-            emptyView.isHidden = true
+            //emptyView.isHidden = true
             devicesTable.reloadData()
         }
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        peripherals = []
-        super.init(coder: aDecoder)
-    }
+ 
     
     func getRSSIImage(RSSI anRSSIValue: Int32) -> UIImage {
         var image: UIImage
@@ -126,8 +123,14 @@ class ScannerViewController: UIViewController, CBCentralManagerDelegate, UITable
     //MARK: - ViewController Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+          peripherals = []
+        
+        devicesTable = UITableView()
+        devicesTable.frame = self.view.bounds
         devicesTable.delegate = self
         devicesTable.dataSource = self
+        self.view.addSubview(devicesTable)
+        devicesTable.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         
         let activityIndicatorView              = UIActivityIndicatorView(style: .gray)
         activityIndicatorView.hidesWhenStopped = true
@@ -162,8 +165,8 @@ class ScannerViewController: UIViewController, CBCentralManagerDelegate, UITable
         if scannedPeripheral.isConnected == true {
             aCell.imageView!.image = UIImage(named: "Connected")
         } else {
-            let RSSIImage = self.getRSSIImage(RSSI: scannedPeripheral.RSSI)
-            aCell.imageView!.image = RSSIImage
+           // let RSSIImage = self.getRSSIImage(RSSI: scannedPeripheral.RSSI)
+           // aCell.imageView!.image = RSSIImage
         }
         
         return aCell
@@ -173,9 +176,15 @@ class ScannerViewController: UIViewController, CBCentralManagerDelegate, UITable
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         bluetoothManager!.stopScan()
         // Call delegate method
-        let peripheral = peripherals[indexPath.row].peripheral
-        self.delegate?.centralManagerDidSelectPeripheral(withManager: bluetoothManager!, andPeripheral: peripheral)
-        self.dismiss(animated: true, completion: nil)
+        
+        if let peri = peripherals{
+            let peripheral = peri[indexPath.row].peripheral
+            self.delegate?.centralManagerDidSelectPeripheral(withManager: bluetoothManager!, andPeripheral: peripheral)
+            self.dismiss(animated: true, completion: nil)
+        }
+        
+        
+        //self.navigationController?.popViewController(animated: true)
     }
     
     //MARK: - CBCentralManagerDelgate

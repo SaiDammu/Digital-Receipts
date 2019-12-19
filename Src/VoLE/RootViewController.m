@@ -8,7 +8,7 @@
 //  Copyright (c) 2014 NXP. All rights reserved.
 //
 
-#import "otaApi.h"
+#import "OtaApi.h"
 #import "qnLoadFile.h"
 
 #import "QnAlertView.h"
@@ -17,8 +17,8 @@
 #import "FwFileViewController.h"
 
 /// #import "QBleServer.h"
-#import "QBleClient.h"
-#import "otaAppPublic.h"
+
+#import "OtaAppPublic.h"
 #import "RootViewController.h"
 
 const uint8_t *fileTestData = nil;
@@ -97,7 +97,7 @@ BOOL flagOtaProccessing = FALSE;
 - (enumOtaClientState)OTA_ClientState
 {
     @synchronized(self)
-	{
+    {
         return OTA_ClientState;
     }
 }
@@ -114,13 +114,13 @@ BOOL flagOtaProccessing = FALSE;
 
 - (void)setOTA_ClientState : (enumOtaClientState) aStatus
 {
-	@synchronized(self)
-	{
-		if (OTA_ClientState != aStatus)
-		{
-			OTA_ClientState = aStatus;
-		}
-	}
+    @synchronized(self)
+    {
+        if (OTA_ClientState != aStatus)
+        {
+            OTA_ClientState = aStatus;
+        }
+    }
 }
 
 - (void)otaReset{
@@ -204,7 +204,7 @@ BOOL flagOtaProccessing = FALSE;
     // Do any additional setup after loading the view from its nib.
     self.title = @"OTA";
     
-    [self.OtaVersion setText:[NSString stringWithFormat: @"Ver %1.2f", QBLUE_OTA_VERSION]];
+   // [self.OtaVersion setText:[NSString stringWithFormat: @"Ver %1.2f", QBLUE_OTA_VERSION]];
     
     [self otaReset];
     [self scanButton].enabled = TRUE;
@@ -212,7 +212,7 @@ BOOL flagOtaProccessing = FALSE;
     /// Note : Please setup for qBleClient connections delegate.
     /// [QBleServer sharedInstance].bleDidPeriConnectedDelegate = self;
     
-    /// Note : Please setup for qBleClient connections delegate. 
+    /// Note : Please setup for qBleClient connections delegate.
     [qBleClient sharedInstance].bleDidCentConnectPeriDelegate = self;
     /// Note : Please setup for OtaApi update delegate.
     [otaApi sharedInstance].otaApiUpdateAppDataDelegate = self;
@@ -310,7 +310,7 @@ BOOL flagOtaProccessing = FALSE;
     else if([alertView.title isEqualToString: ALERT_APP_VERIFY_ERROR_TITLE])
     {
 //        dictBtnIndex = [NSDictionary dictionaryWithObject : [NSString stringWithFormat:@"%u", buttonIndex] forKey:keyAlertFailed];
-//        
+//
 //        [[NSNotificationCenter defaultCenter] postNotificationName : otaAppVerifyErrorNoti object:nil userInfo : dictBtnIndex];
         [[NSNotificationCenter defaultCenter] postNotificationName : otaAppVerifyErrorNoti object:nil userInfo : nil];
     }
@@ -373,7 +373,7 @@ BOOL flagOtaProccessing = FALSE;
     
     OTA_ClientState = OTA_MS_CONNECTED;
     
-    [self.navigationController popViewControllerAnimated : YES];
+  //  [self.navigationController popViewControllerAnimated : YES];
     
     /////
     [self otaStopDidConnDevTimeout];
@@ -613,6 +613,7 @@ BOOL flagOtaProccessing = FALSE;
     [[NSNotificationCenter defaultCenter] postNotificationName: appDevListReloadDataNoti object:nil userInfo:nil];
     
     /// [self presentModalViewController : deviceVC animated:YES];
+    deviceVC.isOTA = YES;
     [self presentViewController:deviceVC animated:YES completion:nil ];
 }
 
@@ -626,10 +627,13 @@ BOOL flagOtaProccessing = FALSE;
 - (void)updateScanBtn {
     NSString *strScanBtn;
     
-    if(OTA_ClientState == OTA_MS_IDLE)
+    if(OTA_ClientState == OTA_MS_IDLE){
         strScanBtn = @"Scan";
-    else
+        _otaLoadFileBtn.hidden = YES;
+    }else{
         strScanBtn = @"Disconnect";
+        _otaLoadFileBtn.hidden = NO;
+    }
 
     [self.scanButton setTitle : strScanBtn forState : UIControlStateNormal];
 }
@@ -798,7 +802,7 @@ BOOL flagOtaProccessing = FALSE;
 /**********************************************************
  @brief response to discovered Char .
  **********************************************************/
--(void)otaEnableConfirmRsp : (NSNotification *)noti 
+-(void)otaEnableConfirmRsp : (NSNotification *)noti
 {
     ///CBPeripheral *otaPeri = [noti.userInfo objectForKey : keyOtaPeripheral];
     
@@ -825,11 +829,11 @@ BOOL flagOtaProccessing = FALSE;
 -(void)otaHideProgressBar:(BOOL) flagHiden{
     if(flagHiden){
         _otaProgressBar.hidden = YES;
-        _otaProgressBarValue.hidden = YES; 
+        _otaProgressBarValue.hidden = YES;
     }
     else{
         _otaProgressBar.hidden = NO;
-        _otaProgressBarValue.hidden = NO; 
+        _otaProgressBarValue.hidden = NO;
     }
 }
 
@@ -1036,7 +1040,7 @@ BOOL flagOtaProccessing = FALSE;
         if([aService.UUID isEqual:[CBUUID UUIDWithString : UUID_OTA_SERVICE_DEF]])
         {
             _isOtaService = TRUE;
-            break; /// 
+            break; ///
         }
     }
     
@@ -1114,7 +1118,7 @@ BOOL flagOtaProccessing = FALSE;
 }
 
 /**********************************************************
- @brief start FwNoRspTimer. 
+ @brief start FwNoRspTimer.
  **********************************************************/
 -(void)otaFwNoRspTimeoutStart{
     otaFwNoRspTimeoutCount++;
@@ -1172,6 +1176,7 @@ BOOL flagOtaProccessing = FALSE;
         [self.otaScanDevActInd stopAnimating];
         
         ///[self presentModalViewController : deviceVC animated:YES];
+        deviceVC.isOTA = YES;
         [self presentViewController:deviceVC animated:YES completion:nil ];
     }
 }
@@ -1245,7 +1250,7 @@ BOOL flagOtaProccessing = FALSE;
 /**********************************************************
  @brief response to app verify error.
  **********************************************************/
--(void)otaAppVerifyErrorRsp 
+-(void)otaAppVerifyErrorRsp
 {
     if(otaConnectedPeri != nil)
         [[qBleClient sharedInstance] pubDisconnectPeripheral : otaConnectedPeri];

@@ -15,10 +15,11 @@
 }
 
 @property (nonatomic,retain) UIRefreshControl *refreshControl;
-
+@property BOOL isOTA;
+@property BOOL isHeartRate;
 - (IBAction)backQppMainVC : (id)sender;
 
 -(void) updatePeriInTableView:(UIRefreshControl *)refreshControl;
 
-+(DeviceViewController *)sharedInstance;
+//+(DeviceViewController *)sharedInstance;
 @end

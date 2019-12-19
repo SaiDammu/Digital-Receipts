@@ -1,0 +1,22 @@
+PODS:
+  - Charts (3.4.0):
+    - Charts/Core (= 3.4.0)
+  - Charts/Core (3.4.0)
+  - CorePlot (2.2)
+
+DEPENDENCIES:
+  - Charts
+  - CorePlot (~> 2.2)
+
+SPEC REPOS:
+  trunk:
+    - Charts
+    - CorePlot
+
+SPEC CHECKSUMS:
+  Charts: 74c9f256eaf0460c0c416522d1cf8c634ea6b286
+  CorePlot: cbe0c6e14220705e32e06a89c7d6a5a908b7d7d8
+
+PODFILE CHECKSUM: cf587d8641d6e20f74e1c4817c4b61b93031b59e
+
+COCOAPODS: 1.8.4

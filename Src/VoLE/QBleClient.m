@@ -1,1818 +1,348 @@
 //
-//  QBlueVoLEViewController.m
-//  bleDevMonitor
+//  QBleClient.m
+//  Qpp Demo
 //
-//  Created by Derek on 12/05/13.
-//  Copyright (c) 2012 QN Inc. All rights reserved.
+// @brief Application Programming Interface Source File for Quintic Ble Client.
 //
-//Orbital
+//  Created by NXP on 5/18/14.
+//  Copyright (c) 2014 NXP. All rights reserved.
+//
 
-#import "QBlueClient.h"
-#import "QBlueDefine.h"
-
-#import "TableViewAlert.h"
-#import "CustomAlertView.h"
-
-#import "QBlueVoLEViewController.h"
-
-#import <QuartzCore/CoreAnimation.h>
-#import <MediaPlayer/MediaPlayer.h>
-#import <CFNetwork/CFNetwork.h>
-
-#import "Constants.h"
-
-//qpp start
-#import "QppPublic.h"
 #import "QBleClient.h"
-#import "QppApi.h"
 
-#import "CustomAlertView.h"
-#import "Utils.h"
+@interface qBleClient ()
+{
+    CBCentralManager *_centralManager;
+    CBPeripheral     *_peripheral;
 
-#import "DeviceViewController.h"
+    NSMutableArray   *_discoveredPeripherals;
+    NSMutableArray   *_discoveredServices;
 
- 
-#define QPP_DIDCONN_DEV_TIMEOUT      5
-//qpp end
-
-#define VOLE_TIMER_STEP               (1.0) //was 5.0
-#define VOLE_SCAN_DEV_TIMEOUT         1  //was 10
-#define VOLE_DIDCONN_DEV_TIMEOUT      50
-#define VOLE_RESUME_TIMEOUT           50
-volatile int startcounting = 3;
-volatile int initialcount = 0;
-//double num[5] = {0.9677, -3.8708, 5.8062, -3.8708, 0.9677};
-//double den[5] = {1.0000, -3.9343, 5.8051, -3.8072, 0.9364};
-
-//volatile double RegX[5];
-//volatile double RegY[5];
-//volatile float CenterTap;
-
-@interface QBlueVoLEViewController () {
-    uint32_t received_data_length;
-    NSDate *refDate;
-    NSDate *intDate;
-    NSString *fname;
-    uint8_t  voleScanDevTimeoutCount;
-    NSTimer *voleScanDevTimeoutTimer;
-    NSString *filepath;
-    uint8_t  voleDidConnDevTimeoutCount;
-    NSTimer *voleDidConnDevTimeoutTimer;
-    uint16_t numm;
-    NSString *numms;
-    NSString *nummst;
-#if QPP_LOG_FILE
-    NSString *_fileLog;
-    NSFileHandle *_fileHdl;
-    
-    NSData  *readerBuf;  //
-#endif
-    
-    NSString *fileNameString;
-    
-    NSMutableData  *writeBuf;  //
-    
-    uint8_t _prev_type;
-    //qpp starty
-    NSTimer *qppDidConnDevTimeoutTimer; /// for connection timeout.
-    uint8_t  qppDidConnDevTimeoutCount; /// for connection timeout.
-    
-    /// BOOL qppEnableStatus;               /// enable status.
-    
-    /// DataRate
-    int8_t dataRateStart;
-    BOOL   flagDataMonitoring;
-    uint16_t qppDataRateMin;
-    uint16_t qppDataRateMax;
-    
-    /// send Data
-    /// u_int64_t qppSendCounter;          /// repeat counter
-    
-    // DeviceViewController *deviceVC;
-    // HelpViewController *helpVC;
-    
-    BOOL flagOnePeriScanned;           /// one peripheral is scanned.
-    
-    // @public
-    u_int64_t preTimeMs, curTimeMs;
-    u_int64_t dataReceived;
-    
-    u_int64_t dynRefTimeMs ;
-    
-    uint8_t qppWrData[512];
-    
-    QppApi *qppApi;
-    DevicesCtrl *devInfo;
-    
-    NSTimer *repeatWrTimer;
-         
-         BOOL fEdited;
-    BOOL pauseGraph;
-    // qpp end
+    BOOL _autoConnect;
 }
-
-@property (strong, nonatomic) NSTimer *voleScanDevTimeoutTimer;
-@property (strong, nonatomic) NSTimer *voleDidConnDevTimeoutTimer;
-@property (weak, nonatomic) IBOutlet UITextField *dataSendTextField;
-
 @end
 
-@implementation QBlueVoLEViewController
+@implementation qBleClient
 
-@synthesize voleScanDevTimeoutTimer;
-@synthesize voleDidConnDevTimeoutTimer;
-//@synthesize myGraph=_myGraph;
+@synthesize bleDidCentConnectPeriDelegate;
+@synthesize bleUpdateForOtaDelegate;
+@synthesize discoveredPeripherals = _discoveredPeripherals;
+@synthesize discoveredServices = _discoveredServices;
 
-
-+ (QBlueVoLEViewController *)sharedInstance
+- (id)init
 {
-    static QBlueVoLEViewController *_sharedInstance = nil;
+    self = [super init];
+    
+    if (self) {
+        _centralManager = [[CBCentralManager alloc]initWithDelegate:self
+                                                              queue:nil];
+
+        _discoveredPeripherals = [[NSMutableArray alloc] init];
+        _discoveredServices = [[NSMutableArray alloc] init];
+        
+        if (_autoConnect) {
+            [self startScan];
+        }
+    }
+    
+    return self;
+}
+
+- (void)dealloc
+{
+    [self stopScan];
+    _centralManager.delegate = nil;
+    _peripheral.delegate = nil;
+}
+
++ (qBleClient *)sharedInstance
+{
+    static qBleClient *_sharedInstance = nil;
     if (_sharedInstance == nil) {
-        _sharedInstance = [[QBlueVoLEViewController alloc] init];
+        _sharedInstance = [[qBleClient alloc] init];
     }
     
     return _sharedInstance;
 }
 
--(id)init {
-    
-    return self;
-}
-
--(void)WriteToStringFile:(NSMutableString *)textToWrite{
-    
-    NSError *err;
-    
-    
-    
-    BOOL ok = [textToWrite writeToFile:@"/test.dat" atomically:YES encoding:NSUnicodeStringEncoding error:&err];
-    
-    if (!ok) {
-        NSLog(@"Error writing file at %@\n%@",
-              @"/users/davidschie/documents/test.dat", [err localizedFailureReason]);
-    }
-}
-
--(NSArray *)ReadTextFromFile:(NSMutableString *)textToRead{
-    
-    NSError *error;
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [paths objectAtIndex:0];
-    NSString *fileInDocumentsPath = [documentsPath stringByAppendingPathComponent:@"Z005.txt"];
-    NSString *myfile = [NSString stringWithContentsOfFile: fileInDocumentsPath encoding: NSUTF8StringEncoding error: &error];
-    
-    return [myfile componentsSeparatedByString:@"\n"];
-}
-
-
-- (void) voleStopScanDevTimeout
-{
-    voleScanDevTimeoutCount = 0;
-    
-    [voleScanDevTimeoutTimer invalidate];
-    
-    [self.voleScanDevActInd stopAnimating];
-}
-
-- (void) voleScanDevTimeoutRsp{
-    
-    if(voleScanDevTimeoutCount < VOLE_SCAN_DEV_TIMEOUT)
-    {
-        voleScanDevTimeoutCount++;
-        
-        [self updateScanCountDown: TRUE withCount:(VOLE_SCAN_DEV_TIMEOUT - voleScanDevTimeoutCount)];
-        
-        return;
-    }
-    
-    [self updateScanCountDown: FALSE withCount : 0];
-    
-    [self voleStopScanDevTimeout];
-    
-    bleDevMonitor *dev = [bleDevMonitor sharedInstance];
-    
-    // create the alert
-    NSArray *otaDevList = [dev discoveredPeripherals];
-    
-    if([otaDevList count])
-    {
-        [[NSNotificationCenter defaultCenter] postNotificationName : voleScanPeriEndNoti object:nil];
-    }
-    else
-    {
-        /// to scan a device timeout.
-        CustomAlertView *voleScanDevAlert = [[CustomAlertView alloc] initWithTitle : ALERT_NODEVICE_TITLE
-                                                                           message : @"No Device Around!"
-                                                                          delegate : nil
-                                                                 cancelButtonTitle : nil/*@"Cancel" */
-                                                                 otherButtonTitles : @"OK", nil];
-        [voleScanDevAlert show];
-    }
-}
-
-- (void) voleStartScanActInd
-{
-    [self.voleScanDevActInd startAnimating];
-    
-    voleScanDevTimeoutCount = 0;
-    
-    voleScanDevTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval : 1.0 target:self selector:@selector(voleScanDevTimeoutRsp) userInfo:nil repeats : YES];
-}
-
-- (IBAction)voleScanPeri:(id)sender {
-    bleDevMonitor *dev = [bleDevMonitor sharedInstance];
-    
-    BOOL isConnected = dev.isConnected;
-    
-    if (isConnected) {
-        [[bleDevMonitor sharedInstance] disconnect];
-    }
-    else {
-        self.receivedDataLabel.text = @"0";
-        self.dataRateLabel.text = @"0";
-        
-        dev.connectionDelegate = self;
-        
-        [self voleStartScanActInd];
-        
-        _voleScanCountDnLbl.text = [NSString stringWithFormat:@"%d", VOLE_SCAN_DEV_TIMEOUT];
-        
-        [dev startScan];
-    }
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    
-    //Device validation
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        
-    }else{
-        
-    }
-    
-    
-    
-    NSDate *date = [NSDate date];
-    NSDateFormatter *formatter = [NSDateFormatter new];
-    [formatter setDateFormat:@"mm.MMM.yy-hh:mm:ss"];
-    NSString *dateString = [formatter stringFromDate:date];
-    fileNameString = [NSString stringWithFormat:@"ECG_%@",dateString];
-
-    filepath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)firstObject] stringByAppendingPathComponent:fileNameString];
-    
-//    [[NSBundle mainBundle]loadNibNamed:@"" owner:self options:nil];
-    
-    
-    sleep(2);
-    refDate = [NSDate date];
-    fname = [NSString stringWithFormat:@"ppg[%d][%@].txt",received_data_length,refDate];
-    //Dave
-    numm=0;
-    numms=@"";
-    nummst=@"";
-    self.ArrayOfValues = [[NSMutableArray alloc] init];
-    self.ArrayOfValues1 = [[NSMutableArray alloc] init];
-    self.ArrayOfValuesBase = [[NSMutableArray alloc] init];
-    
-    self.ArrayOfValuesGolay = [[NSMutableArray alloc] init];
-    self.ledfilter = [[NSMutableArray alloc] init];
-    self.beatdifference = [[NSMutableArray alloc] init];
-    
-   // _myGraph.delegate = self;
-  //  float p;
-    //[self.myGraph reloadGraph];
-    for (int i=0; i < 1000; i++)
-    {
-       // p=1*sin(0.5*i)+100;
-        [self.ArrayOfValues1 addObject:[NSNumber numberWithFloat:(99999)]]; // Random values for the graph
-        //[self.ArrayOfValues addObject:[NSNumber numberWithFloat:(9999)]]; // Random values for the graph
-        
-    }
-    
-    
-    _RespGraph.delegate = self;
-    [self.RespGraph reloadGraph];
-    // Do any additional setup after loading the view from its nib.
-    self.title = @"VoLE Demo";
-    self.temperature.text=@" ";
-    [self.VoLEVersion setText:[NSString stringWithFormat: @"Ver %1.1f", QBLUE_VOLE_VERSION]];
-    
-    [self.connectButton setTitle:@"Scan" forState:UIControlStateNormal];
-    self.connStatusLabel.text = @"><";
-    
-    
-    /*[[@"123457" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:@"/tmp/test2.txt" atomically:NO];
-     NSString *myfile = [NSString stringWithContentsOfFile:@"/tmp/test2.txt"
-     encoding:NSASCIIStringEncoding
-     error:NULL];
-     NSLog(@"Our file contains this: %@", myfile);*/
-    // Documents path
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [paths objectAtIndex:0];
-    
-    // Destination path
-    NSString *fileInDocumentsPath = [documentsPath stringByAppendingPathComponent:@"ecg.txt"];
-    
-    // Origin path
-    NSString *fileInBundlePath = [[NSBundle mainBundle] pathForResource:@"ecg" ofType:@"txt"];
-    
-    // File manager for copying
-    NSError *error = nil;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [fileManager copyItemAtPath:fileInBundlePath toPath:fileInDocumentsPath error:&error];
-    [[@"1234578" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:fileInDocumentsPath atomically:NO];
-    //[[@"123457" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:fileInDocumentsPath atomically:NO];
-    [fileManager copyItemAtPath:fileInDocumentsPath toPath:fileInBundlePath error:&error];
-    NSString *my1file = [NSString stringWithContentsOfFile: fileInDocumentsPath encoding: NSUTF8StringEncoding error: &error];
-    NSLog(@"Our file contains this: %@", my1file);
-    
-    
-    NSFileHandle *file;
-    NSMutableData *data;
-    
-    const char *bytestring = "black dog";
-    
-    data = [NSMutableData dataWithBytes:bytestring
-                                 length:strlen(bytestring)];
-    
-    file = [NSFileHandle fileHandleForUpdatingAtPath:
-            fileInDocumentsPath];
-    
-    if (file == nil)
-        NSLog(@"Failed to open file");
-    
-    [file seekToFileOffset: 5];
-    [file writeData: data];
-    [file closeFile];
-    NSString *my2file = [NSString stringWithContentsOfFile: fileInDocumentsPath encoding: NSUTF8StringEncoding error: &error];
-    NSLog(@"Our file contains this: %@", my2file);
-    [fileManager copyItemAtPath:fileInDocumentsPath toPath:fileInBundlePath error:&error];
-    [self voleResetVC];
-    
-    [self volePlayerReset ];
-    
-    [bleDevMonitor sharedInstance].updateDelegate = self;
-    
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshConnectBtns) name:voleDidDisconnectNoti object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voleUpdateDidConnDev) name:voleDidConnectNoti object:nil];
-    
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voleDisplayPeripherals) name:voleScanPeriEndNoti object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voleSelOnePeripheralRsp:) name:voleSelOnePeripheralNoti object:nil];
-    
-#if QPP_LOG_FILE
-    _fileLog = nil; // zfq
-#endif
-    //qpp star
-    
-    qppApi = [QppApi sharedInstance];
-       
-       [self initDevicesInfo];
-      // [self initUIComAboutCOnnection:NO];
-     
-    
-       
-       qppCentState = QPP_CENT_IDLE;
-       
-       [self refreshConnectBtns];
-           
-       [self regNotification];
-       
-       flagOnePeriScanned = FALSE;
-        [self ScanPeri];
-    
-    //qpp end
-    
-    //start graph from qpp
-    
-    NSString *command = @"3130";//_dataSendTextField.text;
-
-     command = [command stringByReplacingOccurrencesOfString:@" " withString:@""];
-     NSMutableData *commandToSend= [[NSMutableData alloc] init];
-     unsigned char whole_byte;
-     char byte_chars[3] = {'\0','\0','\0'};
-     int i;
-     for (i=0; i < [command length]/2; i++) {
-         byte_chars[0] = [command characterAtIndex:i*2];
-         byte_chars[1] = [command characterAtIndex:i*2+1];
-         whole_byte = strtol(byte_chars, NULL, 16);
-         [commandToSend appendBytes:&whole_byte length:1];
-     }
-     NSLog(@"%@", commandToSend);
-     pauseGraph = YES;
-     [_RespGraph reloadGraph];
-     [qppApi qppSendData : devInfo.qppPeri
-                         withData : commandToSend
-                         withType : CBCharacteristicWriteWithoutResponse/* CBCharacteristicWriteWithResponse */];
-              
-              qppCentState = QPP_CENT_IDLE;
-     [self readQpp];
-    
-}
--(void)ScanPeri{
-    qBleClient *dev = [qBleClient sharedInstance];
-    
-#if QPP_IOS8
-    BOOL isConnected = qppConnectedPeri.isConnected;
-    
-    if (isConnected)
-#endif
-
-        if((qppCentState != QPP_CENT_SCANNING) &&
-           (qppCentState != QPP_CENT_CONNECTING) )
-        {
-            qppCentState = QPP_CENT_SCANNING;
-
-            [dev stopScan];
-            
-            [dev startScan];
-        }
-}
--(void)initDevicesInfo{
-    devInfo = [[DevicesCtrl alloc] init];
-    
-    devInfo.intervalBtwPkg=0.03f;
-    devInfo.fQppWrRepeat = false;
-    devInfo.lengOfPkg2Send=182;
-
-    devInfo.pkgIdx=0;
-    
-    [self refreshData2BeSent:devInfo];
-    
-    [self refreshQppDataToSend:devInfo ];
-}
--(void)refreshQppDataToSend:(DevicesCtrl *)_devInfo{
-    ///qppWrData[0]=_devInfo.pkgIdx;
-    uint16_t header=_devInfo.pkgIdx; /// todo more.
-    /// _devInfo.data2Send=[[NSData alloc] init];
-    /// _devInfo.data2Send=[NSData dataWithBytes:&qppWrData length:QPP_ LENGTH_AT_BLE4_2];
-    NSRange headerRang;
-    headerRang.length=sizeof(header);
-    headerRang.location=0;
-    
-    [_devInfo.data2Send replaceBytesInRange:headerRang withBytes:&header length:sizeof(header)];
-}
--(void)refreshData2BeSent:(DevicesCtrl *)_devCtrl{
-    for(int i=0; i<_devCtrl.lengOfPkg2Send;i++){
-        qppWrData[i]=i;
-    }
-    
-    _devCtrl.data2Send=[[NSMutableData alloc] initWithBytes:qppWrData length:_devCtrl.lengOfPkg2Send];
-}
-
-#pragma mark - qpp notification methods
-- (void)qppDidDiscoveredServicesRsp{
-    NSLog(@"%s", __func__);
-    
-}
-
-/**
- *****************************************************************
- * @brief  app Discovered Services Char.
- *****************************************************************
- */
-- (void)qppDidDiscoveredCharsRsp{
-    NSLog(@"%s", __func__);
-}
-
-/// update data
-/**
- *****************************************************************
- * @brief update state for notify char response.
- *****************************************************************
- */
-- (void)qppUpdateStateForCharRsp:(NSNotification *)noti{
-    NSLog(@"%s", __func__);
-}
-
-- (void)qppSelOnePeripheralRsp :(NSNotification *)noti
-{
-    // CBPeripheral *selectedPeri
-    devInfo.qppPeri=[noti object];
-    
-    [self qppUserConfig];
-    
-    /// to conect the peripheral
-    qBleClient *dev = [qBleClient sharedInstance];
-    [dev stopScan];
-    
-    qppCentState = QPP_CENT_CONNECTING;
-    
-    [dev pubConnectPeripheral : devInfo.qppPeri];
-}
-
--(void)qppUserConfig
-{
-
-    [qBleClient sharedInstance].bleDidConnectionsDelegate = self;
-
-    [QppApi sharedInstance].ptReceiveDataDelegate = self;
-
-}
-- (void)qppMainStopScan
-{
-    flagOnePeriScanned = FALSE;
-    qppCentState = QPP_CENT_IDLE;
-    
-    [[qBleClient sharedInstance] stopScan];
-    
-
-}
--(void)readQpp{
-    
-    [qppApi qppEnableNotify : devInfo.qppPeri
-                withNtfChar : devInfo.aQppNtfChar
-                 withEnable : YES];
-    
-  //  [self.myGraph reloadGraph];
-    
-    
-    if (pauseGraph) {
-        [NSTimer scheduledTimerWithTimeInterval:0.5 repeats:NO block:^(NSTimer * _Nonnull timer) {
-            [self.RespGraph reloadGraph];
-        }];
-    }else{
-     [self.RespGraph reloadGraph];
-    }
-    
-}
-
--(void)didQppEnableConfirmForAppRsp : (NSNotification *)_noti
-{
-    NSDictionary *dictInfo=[_noti object];
-
-    devInfo.aQppWriteChar = [dictInfo objectForKey:keyWrCharInQpp];
-    devInfo.aQppNtfChar = [dictInfo objectForKey:keyNtfCharInQpp];
-    devInfo.fQppEnableStatus = (BOOL)[dictInfo objectForKey:keyConfirmStatus];
-    
-    if(devInfo.fQppEnableStatus)
-    {
-        NSLog(@"qppEnable ok.");
-
-    }
-    else
-    {
-        NSLog(@"qppEnable failed!!!");
-        
-    }
-    if (devInfo.aQppNtfChar!=nil) {
-        [self readQpp];
-    }
-    
+/**********************************************************************
+ Uses CBCentralManager to check whether the current platform/hardware supports Bluetooth LE.
+ An alert is raised if Bluetooth LE is not enabled or is not supported.
  
-    
-}
-#pragma mark - the delegate from QBleClient
-/**
- *****************************************************************
- * @brief       delegate ble update connected peripheral.
- *
- * @param[out]  aPeripheral : the connected peripheral.
- *
- *****************************************************************
- */
--(void)bleDidConnectPeripheral : (CBPeripheral *)aPeripheral{
-    NSLog(@"line : %d, func: %s ",__LINE__, __func__);
-    
-    if(aPeripheral == devInfo.qppPeri)
-    {
-        [qppApi  qppEnable : devInfo.qppPeri
-            withServiceUUID : UUID_QPP_SVC
-                                withWrChar : UUID_QPP_CHAR_FOR_WRITE];
-        
-        qppCentState = QPP_CENT_CONNECTED;
-     
-        [self qppStopDidConnDevTimeout];
-        [self refreshConnectBtns];
-        
-
-    }
-}
-
--(void)bleDidDisconnectPeripheral : (CBPeripheral *)aPeripheral error : (NSError *)error{
-    /// NSLog(@"%s",__func__);
-    qppCentState = QPP_CENT_IDLE;
-    
-    [self qppStopDidConnDevTimeout];
-    
-    [self refreshConnectBtns];
-    
-    [[Utils sharedInst] cancelTimer:repeatWrTimer];
-
-}
-
-///**
-// *****************************************************************
-// * @brief       delegate ble update connected peripheral.
-// *
-// * @param[out]  aPeripheral : the connected peripheral.
-// *
-// *****************************************************************
-// */
-//-(void)bleDidRetrievePeripheral : (NSArray *)aPeripheral{
-//    qppCentState = QPP_CENT_RETRIEVED;
-//}
-
-/**
- *****************************************************************
- * @brief       delegate ble update connected peripheral.
- *
- * @param[out]  aPeripheral : the connected peripheral.
- *
- *****************************************************************
- */
--(void)bleDidFailToConnectPeripheral : (CBPeripheral *)aPeripheral
-                               error : (NSError *)error{
-    qppCentState = QPP_CENT_IDLE;
-}
-
-#pragma mark - discovered ....
-- (void)qppDidPeriDiscoveredRsp{
-
-    NSLog(@"%s", __func__);
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: ReloadDevListDataNoti object:nil userInfo:nil];
-    
-    if(flagOnePeriScanned == FALSE)
-    {
-        flagOnePeriScanned = TRUE;
-        
-       
-        
-        /// [self presentModalViewController : deviceVC animated:YES ];
-        DeviceViewController *deviceVC = [[DeviceViewController alloc]init];
-        [self presentViewController: deviceVC animated:YES completion:nil];
-    }
-   
-}
-#pragma mark - qpp delegate
-- (void)didQppReceiveData : (CBPeripheral *) aPeripheral
-             withCharUUID : (CBUUID *)qppUUIDForNotifyChar
-                 withData : (NSData *)data{
-         
-    uint16_t length = data.length;
+ CBCentralManagerStateUnknown = 0,
+ CBCentralManagerStateResetting,
+ CBCentralManagerStateUnsupported,
+ CBCentralManagerStateUnauthorized,
+ CBCentralManagerStatePoweredOff,
+ CBCentralManagerStatePoweredOn ONLY maps to TRUE
  
-    pauseGraph = NO;
-    
-    NSUInteger capacity = data.length;
-    NSMutableString *sbuf = [NSMutableString stringWithCapacity:capacity];
-    const unsigned char *buf = data.bytes;
-    NSInteger i;
-
-    for (int i=0; i<data.length; i++) {
-        [sbuf appendFormat:@"%02X",(NSUInteger)buf[i]];
-    }
-    
-    NSLog(@"qpp data %@",sbuf);
-    
-    
-    const unsigned char *value = data.bytes;
-    
-    for (int i=0; i<data.length; i++) {
-        //[buf appendFormat:@" %02lx",(unsigned long)value[i]];
-        NSString *hexString = [NSString stringWithFormat:@" %02lx",(unsigned long)value[i]];
-        unsigned result = 0;
-        NSScanner *scanner = [NSScanner scannerWithString:hexString];
-        [scanner setScanLocation:0];
-        [scanner scanHexInt:&result];
-        NSLog(@"qpp float %d",result);
-          [self.ArrayOfValues1 removeObjectAtIndex:0];
-       // [self.ArrayOfValuesBase addObject:[NSNumber numberWithInteger:result]];
-        [self.ArrayOfValues1 addObject:[NSNumber numberWithInteger:result]];
-
-        /*
-        dispatch_async(dispatch_get_main_queue(), ^(void){
-            //Background Thread
-            NSError *error;
-            NSString *filepath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)firstObject] stringByAppendingPathComponent:fileNameString];
+ **********************************************************************/
+- (BOOL) isLECapableHardware
+{
+    switch ([_centralManager state])
+    {
+        case CBCentralManagerStateUnsupported:
             
-            NSString *str = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
-            // NSLog(@"ecg %@",str);
-            NSString *valueString = [NSString stringWithFormat:@"%u",result];
-            NSString *writeString = [NSString stringWithFormat:@"%@\nLinear::%@",str,valueString];
-            [self writeDataTxtFile:writeString];
-        });
-         */
-    }
-          //_RespGraph.delegate = self;
-        //  [self.RespGraph reloadGraph];
-    
-    // writing data into txt file // fileName string respresents txt file title
-          
-      #if QPP_LOG_FILE
-          // write data to log file
-          [writeBuf appendBytes:[data bytes] length:20 ];
-      #endif
-          
-    //  NSLog(@"qpp data %@",qppData);
-      //   [self qppDataRateAveragedReset];
-       // [qppApi qppEnableNotify : devInfo.qppPeri
-       //             withNtfChar : devInfo.aQppNtfChar
-        //             withEnable : YES];
-       // [self readQpp];
-  
-}
-
--(void)writeDataTxtFile:(NSString*)inputString{
-  
-    NSError *error;
-    [inputString writeToFile:filepath atomically:YES encoding:NSUTF8StringEncoding error:&error];
-   // NSLog(@"qpp txt write error %@",error);
-    
-    NSString *str = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
-   // NSLog(@"ecg %@",str);
-    
-}
-
-/* {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [paths objectAtIndex:0];
-    
-    // Destination path
-    NSString *fileInDocumentsPath = [documentsPath stringByAppendingPathComponent:@"ecg1.txt"];
-    
-    // Origin path
-    NSString *fileInBundlePath = [[NSBundle mainBundle] pathForResource:@"ecg1" ofType:@"txt"];
-    
-    // File manager for copying
-    NSError *error = nil;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    [fileManager copyItemAtPath:fileInBundlePath toPath:fileInDocumentsPath error:&error];
-    [[@"1234578" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:fileInDocumentsPath atomically:NO];
-    //[[@"123457" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:fileInDocumentsPath atomically:NO];
-    [fileManager copyItemAtPath:fileInDocumentsPath toPath:fileInBundlePath error:&error];
-    NSString *my1file = [NSString stringWithContentsOfFile: fileInDocumentsPath encoding: NSUTF8StringEncoding error: &error];
-    NSLog(@"Our file contains this: %@", my1file);
-    
-    
-    NSFileHandle *file;
-    NSMutableData *data;
-    
-    const char *bytestring = [inputString UTF8String];
-    
-    data = [NSMutableData dataWithBytes:bytestring
-                                 length:strlen(bytestring)];
-    
-    file = [NSFileHandle fileHandleForUpdatingAtPath:
-            fileInDocumentsPath];
-    
-    if (file == nil)
-        NSLog(@"Failed to open file");
-    
-    [file seekToFileOffset: 5];
-    [file writeData: data];
-    [file closeFile];
-    NSString *my2file = [NSString stringWithContentsOfFile: fileInDocumentsPath encoding: NSUTF8StringEncoding error: &error];
-    NSLog(@"Our file contains this: %@", my2file);
-    [fileManager copyItemAtPath:fileInDocumentsPath toPath:fileInBundlePath error:&error];
-}*/
-/*
-{
-  
-    if(!devInfo.fQppEnableStatus )
-    {
-        
-        return;
-    }
-    
-    const int8_t *rspData = [qppData bytes];
-    
-    if(rspData == nil)
-    {
-        return;
-    }
-
-     NSDate *  currentTime = [NSDate date];
-        
-        NSDateFormatter  *dateformatter=[[NSDateFormatter alloc] init];
-        
-        [dateformatter setDateFormat:@"HH:mm:ss.SSSS"];
-        
-        curTimeMs = [self getDateTimeTOMilliSeconds : currentTime];
-        
-        uint64_t deltaTime = curTimeMs - preTimeMs;
-        
-        if(deltaTime == 0) /// overflow
-            return;
-         
-        /// NSLog(@"deltaTime %llu", deltaTime);
-        
-    #if 1
-        dataReceived += [qppData length]; /// * 255;
-        
-        float qppCurDataRate = (dataReceived * 1000 / deltaTime);
-    #else
-        /// float qppCurDataRate = (dataReceived * 1000 / deltaTime);
-        float qppCurDataRate = (255 * 20 * 1000 / deltaTime);
-    #endif
-
-        NSString *qppDataString= [NSString stringWithFormat:@"%d", (int)qppCurDataRate];
-    NSLog(@"data qp %@",qppDataString);
-    
-    NSUInteger capacity = qppData.length;
-    NSMutableString *sbuf = [NSMutableString stringWithCapacity:capacity];
-    const unsigned char *buf = qppData.bytes;
-    NSInteger i;
-
-    for (int i=0; i<qppData.length; i++) {
-        [sbuf appendFormat:@"%02X",(NSUInteger)buf[i]];
-    }
-    
-    NSLog(@"char data %@",sbuf);
-    
-    NSString *hexString = [NSString stringWithFormat:@"0x%@",sbuf];
-    
+            break;
+        case CBCentralManagerStateUnauthorized:
             
-    NSScanner *scaner = [[NSScanner alloc]initWithString:hexString];
-        double opValue = 0;
-    [scaner scanHexDouble:&opValue];
-    NSLog(@"val:: %.0f",opValue);
-    
-    NSNumberFormatter *numFormatter = [[NSNumberFormatter alloc]init];
-    numFormatter.numberStyle = kCFNumberFormatterDecimalStyle;
-    [numFormatter setMaximumFractionDigits:20];
-        
-    NSLog(@"VVal:: %@",[numFormatter stringFromNumber:[NSNumber numberWithDouble:opValue]]);
-    
-    
-    
-        
- char myString[]="0x3f9d70a4";
-  uint32_t num;
-  long f;
-  sscanf(myString, "%x", &num);  // assuming you checked input
-  f = *((long*)&num);
-    printf("the hexadecimal 0x%08x becomes %.3ld as a float\n", num, f);
-   /*
-    
-   typedef union {
-        float f;
-        uint32_t i;
-    }FloatInt;
-    
-    FloatInt f1;
-    
-    NSScanner *scanner = [NSScanner scannerWithString:[NSString stringWithFormat:@"0x%@",sbuf]];
-    
-    if ([scanner scanHexInt:&f1.i]) {
-        NSLog(@"%x -- %f",f1.i,f1.f);
-    }else{
-        NSLog(@"parse error");
-    }
-    */
-    /*
-  
-    devInfo.lengOfPkg2Send=[self selectPkgLengMax:devInfo.lengOfPkg2Send withNewLength:(int)[qppData length]];
-    
-    
-    if(flagDataMonitoring)
-    {
-        if(dataRateStart == rspData[0])
+            break;
+        case CBCentralManagerStatePoweredOff:
+            break;
+        case CBCentralManagerStatePoweredOn:
         {
-            [[NSNotificationCenter defaultCenter] postNotificationName : strQppUpdateDataRateDynNoti object:qppData ];
+            [self startScan];
         }
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName : strQppUpdateDataRateAvgNoti object:qppData ];
+            return TRUE;
+        case CBCentralManagerStateUnknown:
+        default:
+            return FALSE;
+            
     }
-    else{
-        flagDataMonitoring = TRUE;
-
-        dynRefTimeMs = 0l;
-        
-        if(dataRateStart != rspData[0])
-        {
-            dataRateStart = rspData[0];
-        }
-    }
-     [self qppDataRateAveragedReset];
-    [qppApi qppEnableNotify : devInfo.qppPeri
-                withNtfChar : devInfo.aQppNtfChar
-                 withEnable : NO];
-    [self readQpp];
+    
+    return FALSE;
 }
 
-*/
-
--(void)qppDataRateAveragedReset{
-    dataReceived = 0;
-    
-    
-    NSDate *  qppRefTime = [NSDate date];
-    
-    preTimeMs = [self getDateTimeTOMilliSeconds : qppRefTime];
-}
-
--(int)selectPkgLengMax:(int)curLength withNewLength:(int)newLength{
-    if(newLength>=curLength)
-        return newLength;
-    
-    return curLength;
-}
-#if __BACKUP_CODE
--(void)didQppEnableConfirm : (CBPeripheral *)aPeripheral
-                withStatus : (BOOL) qppEnableResult{
-    
-    qppEnableStatus = qppEnableResult;
-    
-    if(qppEnableStatus)
-    {
-        NSLog(@"qppEnable OK !");
-    }
-    else
-    {
-        NSLog(@"qppEnable failed!!!");
-    }
-}
-#endif
-
-#pragma mark -
-- (void)qppDisplayPeripherals
+/*********************************************************************
+ start Scan Peripherals
+ In : None
+ Out : None
+ Return : None
+ *********************************************************************/
+- (void)startScan
 {
-    NSLog(@"%s", __func__);
-   // [self.ptScanDevActInd stopAnimating];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: ReloadDevListDataNoti object:nil userInfo:nil];
-    
-    /// [self presentModalViewController : deviceVC animated:YES];
+    [_discoveredPeripherals removeAllObjects];
+    [_centralManager scanForPeripheralsWithServices:nil
+                                            options:nil];
 }
 
-/**
- *****************************************************************
- * @brief Qpp Stop connect device timeout.
- *****************************************************************
- */
-- (void) qppStopDidConnDevTimeout
+/*********************************************************************
+ stop Scan Peripherals
+ In : None
+ Out : None
+ Return : None
+ *********************************************************************/
+- (void)stopScan
 {
-    qppDidConnDevTimeoutCount = 0;
-    [qppDidConnDevTimeoutTimer invalidate];
-//    [self.ptDidConnDevActInd stopAnimating];
+    [_centralManager stopScan];
 }
 
-/**
- *****************************************************************
- * @brief Qpp Connect device timeout response.
- *****************************************************************
- */
-- (void) qppDidConnDevTimeoutRsp{
-    // if(qppDidConnDevTimeoutCount > QPP_DIDCONN_DEV_TIMEOUT)
-    {
-        [self qppStopDidConnDevTimeout];
-        
-        /// to scan a device timeout.
-        CustomAlertView *pbDidConnDevAlert = [[CustomAlertView alloc] initWithTitle : ALERT_CONNECT_FAIL_TITLE
-                                                                            message:@"Connection failed!"
-                                                                           delegate:nil
-                                                                  cancelButtonTitle:nil /*@"Cancel" */
-                                                                  otherButtonTitles:@"OK", nil];
-        [pbDidConnDevAlert show];
-    }
-}
-
-/**
- *****************************************************************
- * @brief Qpp Start connect device Activity Indicator.
- *****************************************************************
- */
-
-///
-/**
- *****************************************************************
- * @brief Qpp Get reference time.
- *****************************************************************
- */
-- (NSDate *)getDateTimeFromMilliSeconds:(uint64_t) miliSeconds
-{
-    NSTimeInterval tempMilli = miliSeconds;
-    NSTimeInterval seconds = tempMilli/1000.0;
+/*********************************************************************
+ connect a Peripheral
+ In :
+ aPeripheral  : to connect
+ Out : None
  
-    return [NSDate dateWithTimeIntervalSince1970:seconds];
-}
-
-/**
- *****************************************************************
- * @brief Qpp Start Scan device Activity Indicator.
- * convert time with NSDate format into NSInteger, from 1970/1/1
- *****************************************************************
- */
-- (uint64_t)getDateTimeTOMilliSeconds:(NSDate *)datetime
+ Return : None
+ *********************************************************************/
+- (void)pubConnectPeripheral:(CBPeripheral *)aPeripheral
 {
-    NSTimeInterval interval = [datetime timeIntervalSince1970];
-     
-    uint64_t totalMilliseconds = interval*1000 ;
-    
-    return totalMilliseconds;
+    [_centralManager connectPeripheral:aPeripheral options:nil];
+    _peripheral = aPeripheral;
 }
 
-/**
- *****************************************************************
- * @brief Qpp Update Data Rate.
- *****************************************************************
- */
-
-
-
-
--(NSString *) CBUUIDToUUID : (CBUUID *) UUID {
-    
-    NSString *strUUID = [NSString stringWithFormat:@"%s",[[UUID.data description] cStringUsingEncoding : NSStringEncodingConversionAllowLossy]];
-    
-    return strUUID;
-}
--(void)regNotification{
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppDidPeriDiscoveredRsp) name: blePeriDiscoveredNoti object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppDidDiscoveredServicesRsp) name: bleDiscoveredServicesNoti object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppDidDiscoveredCharsRsp) name: bleDiscoveredCharacteristicsNoti object:nil];
-    
-    /// update data
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppUpdateStateForCharRsp:) name: strQppUpdateStateForCharNoti object:nil];
-    
-    /// UI
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppDisplayPeripherals) name:strQppScanPeriEndNoti object:nil];
-    
-
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppSelOnePeripheralRsp:) name : qppSelOnePeripheralNoti object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppMainStopScan) name : qppMainStopScanNoti object:nil];
-    //qpp
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didQppEnableConfirmForAppRsp:) name: didQppEnableConfirmForAppNoti object:nil];
-  
-    
-}
-
-- (int)numberOfPointsInGraph {
-    return (int)[self.ArrayOfValues count];
-}
-    
-- (float)valueForIndex:(NSInteger)index {
-    NSLog(@"index 0 %ld",(long)index);
-    return [[self.ArrayOfValues objectAtIndex:index] floatValue];
-}
--(BOOL)pauseGraph{
-    NSLog(@"yes qpp");
-    return pauseGraph;
-}
-- (int)numberOfPointsInGraph1 {
-    return (int)[self.ArrayOfValues1 count];
-}
-
-- (float)valueForIndex1:(NSInteger)index {
-   // NSLog(@"indx %ld",(long)index);
-    
-    NSError *error;
-    NSString *filepath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)firstObject] stringByAppendingPathComponent:fileNameString];
-    
-    NSString *str = [NSString stringWithContentsOfFile:filepath encoding:NSUTF8StringEncoding error:&error];
-    // NSLog(@"ecg %@",str);
-    //NSNumber *num =
-    NSString *valueString = [NSString stringWithFormat:@"%f",[[self.ArrayOfValues1 objectAtIndex:index] floatValue]];
-    if (![valueString isEqualToString:@"99999.000000"]){
-        NSString *writeString = [NSString stringWithFormat:@"%@\nLinear::%@",str,valueString];
-        [self writeDataTxtFile:writeString];
-    }
-    return [[self.ArrayOfValues1 objectAtIndex:index] floatValue];
-}
--(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    [self.view endEditing:YES];
-}
-
-- (IBAction)qppDataSend:(id)sender {
-    
+/*********************************************************************
+ disconnect a Peripheral
+ In :
+ aPeripheral  : to disconnect
+ Out : None
  
-    [self refreshData2BeSent:devInfo];
-    
-    if(devInfo.fQppEnableStatus == FALSE){
-        NSLog(@"qppEnable failed!!!");
-    }
-    else
-    {
-//        if(qppCentState == QPP_CENT_SENDING)
-//        {
-//            [self qppSendReset];
-//        }
-//        else
-        {
-            qppCentState = QPP_CENT_SENDING;
-            
+ Return : None
+ *********************************************************************/
+- (void)pubDisconnectPeripheral:(CBPeripheral *)aPeripheral
+{
+    [_centralManager cancelPeripheralConnection : aPeripheral ];
+}
 
-            NSString *strEdited = _dataSendTextField.text;
-
-           
-            
-            if(fEdited){
-                NSData *inData=[[Utils sharedInst] hexStrToBytes : strEdited withStrMin:TEXT_EDITED_LENGTH_MIN withStrMax: [strEdited length]];
-                
-                devInfo.data2Send=[[NSMutableData alloc] initWithData:inData];
-            }
-            
-            if(devInfo.data2Send == NULL)
-            {
-                /// illegal input
-                CustomAlertView *inputAlert = [[CustomAlertView alloc]
-                                            initWithTitle : ALERT_INPUT_ERROR_TITLE
-                                                  message : @"Input error!"
-                                                 delegate : nil
-                                        cancelButtonTitle : nil
-                                        otherButtonTitles : @"OK", nil];
-                [inputAlert show];
-                
-                return;
-            }
+/*********************************************************************
+ retrieve a Peripheral
+ In :
+ aPeripheral  : to retrieve
+ Out : None
  
-            NSString *command = _dataSendTextField.text;
+ Return : None
+ *********************************************************************/
+-(void)pubRetrievePeripheral : (CBPeripheral *)aPeripheral
+{
+//    [_centralManager retrievePeripherals : [NSArray arrayWithObject:(id)aPeripheral.identifier]];
+    [_centralManager retrievePeripheralsWithIdentifiers:[NSArray arrayWithObject:(id)aPeripheral.identifier]];
+}
 
-            command = [command stringByReplacingOccurrencesOfString:@" " withString:@""];
-            NSMutableData *commandToSend= [[NSMutableData alloc] init];
-            unsigned char whole_byte;
-            char byte_chars[3] = {'\0','\0','\0'};
-            int i;
-            for (i=0; i < [command length]/2; i++) {
-                byte_chars[0] = [command characterAtIndex:i*2];
-                byte_chars[1] = [command characterAtIndex:i*2+1];
-                whole_byte = strtol(byte_chars, NULL, 16);
-                [commandToSend appendBytes:&whole_byte length:1];
-            }
-            NSLog(@"%@", commandToSend);
-            pauseGraph = YES;
-            [_RespGraph reloadGraph];
-            [qppApi qppSendData : devInfo.qppPeri
-                                withData : commandToSend
-                                withType : CBCharacteristicWriteWithoutResponse/* CBCharacteristicWriteWithResponse */];
-                     
-                     qppCentState = QPP_CENT_IDLE;
-            [self readQpp];
-            
-            
-//            if(devInfo.fQppWrRepeat){
-//                repeatWrTimer= [NSTimer scheduledTimerWithTimeInterval:devInfo.intervalBtwPkg target:self selector:@selector(didRepeatWrData:) userInfo:devInfo repeats:YES];
-//            }
-        }
+#pragma mark - CBCentralManagerDelegate
+
+/*********************************************************************
+ Invoked whenever the central manager's state is updated.
+ *********************************************************************/
+- (void)centralManagerDidUpdateState:(CBCentralManager *)central
+{
+    [self isLECapableHardware];
+}
+
+/******************************************************************
+ Invoked when the central discovers Qpp peripheral while scanning.
+ ******************************************************************/
+- (void) centralManager:(CBCentralManager *)central
+  didDiscoverPeripheral:(CBPeripheral *)aPeripheral
+      advertisementData:(NSDictionary *)advertisementData
+                   RSSI:(NSNumber *)RSSI
+{
+    if( ![_discoveredPeripherals containsObject:aPeripheral] )
+    {
+        [_discoveredPeripherals addObject:aPeripheral];
+        [[NSNotificationCenter defaultCenter] postNotificationName: blePeriDiscoveredNoti object:nil userInfo : nil];
+    }
+    
+    /* Retreive already known devices */
+    if(_autoConnect)
+    {
+//        [_centralManager retrievePeripherals:[NSArray arrayWithObject:(id)aPeripheral.identifier]];
+        [_centralManager retrievePeripheralsWithIdentifiers:[NSArray arrayWithObject:(id)aPeripheral.identifier]];
     }
 }
 
-- (void)refreshConnectBtns {
-    BOOL isConnected = [bleDevMonitor sharedInstance].isConnected;
+/*********************************************************************
+ Invoked when the central manager retrieves the list of known peripherals.
+ Automatically connect to first known peripheral
+ *********************************************************************/
+- (void)centralManager:(CBCentralManager *)central
+    didRetrievePeripherals : (NSArray *)peripherals
+{
     
-    NSLog(@"\n func : %s\n", __func__);
+    [self stopScan];
     
-    if (isConnected) {
-        [self.connectButton setTitle:@"Disconnect" forState:UIControlStateNormal];
+    /* If there are any known devices, automatically connect to it.*/
+    if([peripherals count] > 0)
+    {
+        _peripheral = [peripherals objectAtIndex : 0];
         
+        [_centralManager connectPeripheral:_peripheral
+                                   options:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:CBConnectPeripheralOptionNotifyOnDisconnectionKey]
+         ];
+    }
+    
+    
+}
+
+/*********************************************************************
+ Invoked whenever a connection is succesfully created with the peripheral.
+ Discover available services on the peripheral
+ *********************************************************************/
+- (void) centralManager : (CBCentralManager *)central
+   didConnectPeripheral : (CBPeripheral *)aPeripheral
+{
+    [aPeripheral setDelegate : self];
+    [aPeripheral discoverServices : nil];
+    
+    [bleDidCentConnectPeriDelegate bleDidConnectPeripheral : aPeripheral];
+}
+
+/*********************************************************************
+ Invoked whenever an existing connection with the peripheral is torn down.
+ Reset local variables
+ *********************************************************************/
+- (void)centralManager      : (CBCentralManager *)central
+    didDisconnectPeripheral : (CBPeripheral *)aPeripheral
+                      error : (NSError *)error
+{
+    if( aPeripheral)
+    {
+        [bleDidCentConnectPeriDelegate bleDidDisconnectPeripheral : aPeripheral error :error];
         
+        aPeripheral.delegate = nil;
+        aPeripheral = nil;
+    }
+}
+
+/*********************************************************************
+ Invoked whenever the central manager fails to create a connection
+ with the peripheral.
+ *********************************************************************/
+- (void)centralManager : (CBCentralManager *)central
+didFailToConnectPeripheral : (CBPeripheral *)aPeripheral
+                 error : (NSError *)error
+{
+    if( aPeripheral )
+    {
+        [bleDidCentConnectPeriDelegate bleDidFailToConnectPeripheral : aPeripheral error :error];
         
-        NSString *dev_name = [[bleDevMonitor sharedInstance] devName];
-        if (dev_name) {
-            self.devNameLabel.text = dev_name;
-            NSLog(@"Device Name is %@", dev_name);
-        }
-        self.connStatusLabel.text = @"<>";
-        received_data_length = 0;
-        refDate = [NSDate date];
-        NSLog(@"refDate %@", refDate.description);
+        [aPeripheral setDelegate:nil];
+        aPeripheral = nil;
+    }
+}
+
+/*********************************************************************
+ Invoked whenever the central manager retrieve to create a connection
+ with the peripheral.
+ *********************************************************************/
+- (void)centralManager:(CBCentralManager *)central didRetrieveConnectedPeripherals:(NSArray *)peripherals
+{
+    [bleDidCentConnectPeriDelegate bleDidRetrievePeripheral : peripherals];
+}
+
+#pragma mark - CBPeripheralDelegate
+/*********************************************************************
+ Invoked upon completion of a -[discoverServices:] request.
+ Discover available characteristics on interested services
+ *********************************************************************/
+- (void) peripheral:(CBPeripheral *)aPeripheral
+    didDiscoverServices:(NSError *)error
+{
+    [_discoveredServices removeAllObjects];
+    
+    for (CBService *aService in aPeripheral.services)
+    {
+        [aPeripheral discoverCharacteristics : nil forService : aService];
         
-#if QPP_LOG_FILE
-        NSString *documentsDirectory = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents"];
-        
-        //NSString *_filePath= [documentsDirectory stringByAppendingPathComponent:@"log.txt"];
-        NSString *_filePath= [documentsDirectory stringByAppendingPathComponent:@"testAudio.caf"];
-        
-        BOOL r = [[NSFileManager defaultManager] createFileAtPath:_filePath contents:nil attributes:nil];
-        
-        _fileHdl = [NSFileHandle fileHandleForUpdatingAtPath:_filePath];
-        
-        if (r == NO || _fileHdl == nil)
+        if( ![_discoveredServices containsObject : aService] )
         {
-            NSLog(@"File Open Error!\n");
+            [_discoveredServices addObject : aService];
         }
-        
-        _fileLog = [[NSString alloc] init];
-        
-#endif
-        // device side should send the first type be 1 every time the link be created
-        _prev_type = 0;
     }
-    else
-    {
-        [self.connectButton setTitle:@"Scan" forState:UIControlStateNormal];
-        
-        
-        self.connStatusLabel.text = @"><";
-        self.devNameLabel.text = @"No Device";
-        
-#if QPP_LOG_FILE
-        
-        NSLog(@"_fileHdl %@\n",_fileHdl);
-        
-        [_fileHdl seekToEndOfFile];
-        
-        [_fileHdl writeData: writeBuf];
-        
-        [_fileHdl closeFile];
-        
-        // clean writeBuf
-        
-        writeBuf = [NSMutableData alloc] ;
-        
-        _fileLog = nil;
-        
-#endif
-    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName : bleDiscoveredServicesNoti
+                                                        object : nil
+                                                      userInfo : nil];
 }
 
-#pragma mark - RECEIVED_DATA_LENGTH
-
-- (void)bleDevMonitor:(bleDevMonitor *)client didUpdateReceivedData:(NSData *)data
+/*********************************************************************
+ Invoked upon completion of a -[discoverCharacteristics:forService:] request.
+ Perform appropriate operations on interested characteristics
+ *********************************************************************/
+- (void) peripheral : (CBPeripheral *)aPeripheral
+    didDiscoverCharacteristicsForService : (CBService *)service error : (NSError *)error
 {
-    uint16_t length = data.length;
-   
-#if QPP_DATA_CHECK
-    // check the received data
-    const uint8_t *reportData = [data bytes];
+    /// for quintic profile delegate
+    [bleUpdateForOtaDelegate bleDidUpdateCharForOtaService : aPeripheral
+                                               withService : service
+                                                     error : error];
     
-    uint8_t type = reportData[0];
-    if ((uint8_t)(type - _prev_type) != 1)
-    {
-        NSLog(@"Error: %d:%d", _prev_type, type);
-        UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"QPP Alert View"
-                                                    message:@"Received data check failed!"
-                                                   delegate:self
-                                          cancelButtonTitle:@"Cancel"
-                                          otherButtonTitles:nil, nil];
-        [av show];
-    }
-    _prev_type = type;
-#endif
-    
-    // data rate
-    uint16_t data_rate;
-    static uint32_t length_interval = 0;
-    static bool data_rate_history = NO;
-    
-    
-    if (received_data_length == 0)
-    {
-        refDate = [NSDate date];
-        data_rate = 0;
-        length_interval = 0;
-        data_rate_history = NO;
-    }
-    else
-    {
-#if UPDATE_DATA_RATE_IN_TIME
-        length_interval += length;
-        if (length_interval <= 20)
-        {
-            refDate = [NSDate date];
-            intDate = [[NSDate date]initWithTimeInterval:UPDATE_DATA_RATE_INTERVAL sinceDate:refDate];
-            data_rate = 0;
-        }
-        else
-        {
-            NSDate *curDate = [NSDate date];
-            if ([curDate compare: intDate] != NSOrderedAscending)
-            {
-                NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:refDate];
-                data_rate = (length_interval-20)/interval;
-                // NSLog(@"data length = %d, date rate = %d", length_interval, data_rate);
-                length_interval = 0;
-                data_rate_history = YES;
-            }
-            else
-            {
-                if (data_rate_history == NO)
-                {
-                    NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:refDate];
-                    data_rate = (length_interval-20)/interval;
-                }
-                else
-                {
-                    data_rate = 0;
-                }
-            }
-        }
-#else
-        NSTimeInterval interval;
-        interval = [[NSDate date] timeIntervalSinceDate:refDate];
-        data_rate = (received_data_length-20)/interval;
-#endif
-    }
-    // total length
-    received_data_length += length;
-    
-    if (length && received_data_length) {
-        // total length display
-        self.receivedDataLabel.text = [NSString stringWithFormat:@"%d", received_data_length];
-        // data rate display
-        if (data_rate != 0)
-        {
-            self.dataRateLabel.text = [NSString stringWithFormat:@"%d", data_rate];
-        }
-        //self.temperature.text = [NSString stringWithFormat:@"%d", 80];
-//        NSString* myString;
-        // myString = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
-        
-        uint16_t number2[10];
-        
-        uint16_t *number = (uint16_t*)data.bytes;// [data bytes];
-//        int16_t temp;
-        int8_t ia=0;
-        int8_t ib=0;
-        int8_t i=0;
-        uint16_t latest;
-        
-        static int start = 0;
-        static int countcheck = 0;
-        static int printbeat = 0;
-        static int fileCount = 0;
-        static double RegX[41];
-        static double RegX1[41];
-        
-        double CenterTap;
-        double CenterTap1; /// first derivative
-                
-        
-        while(i<([data length]/2))
-        {
-           // number2[i]=number[i];
-            number2[i] = (0x3FFF & number[i]);
-            i++;
-        }
-        
-        i=0;ia=0;ib=0;
-        int A = 0, B = 65000;
-        int a = 75, b = 125;
-        int newvalue;
-        int currentvalue;
-        static float timestamp = 0.0;
-        if(start == 0)
-        {
-            for(int j=0;j<41;j++)
-            {
-                RegX[j]=0;
-                RegX1[j]=0;
-            }
-            start = 1;
-        }
-        
-        
-        for (i=0; i<[data length]/2; i++)
-        {
-            /* Store it in a file */
-            [self.ArrayOfValuesBase addObject:[NSNumber numberWithInteger:(number[i])]];
-            numm=[(NSNumber *)[self.ArrayOfValuesBase objectAtIndex:(fileCount)] intValue];
-            numms = [NSString stringWithFormat:@"%d\n", numm];
-            nummst = [nummst stringByAppendingString:numms];
-            fileCount++;
-            if(fileCount>=240)
-            {
-                
-                NSFileHandle *file;
-                // Documents path
-                NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-                NSString *documentsPath = [paths objectAtIndex:0];
-                // Destination path
-                NSString *fileInDocumentsPath = [documentsPath stringByAppendingPathComponent:fname];
-                NSData* writeData = [nummst dataUsingEncoding:NSUTF8StringEncoding];
-                
-              //  NSString* tempString;
-              //  tempString = [[NSString alloc] initWithData:writeData encoding:NSASCIIStringEncoding];
-                if (![[NSFileManager defaultManager] fileExistsAtPath:fileInDocumentsPath]) {
-                    [[NSFileManager defaultManager] createFileAtPath:fileInDocumentsPath contents:nil attributes:nil];
-                }
-                
-                
-                file = [NSFileHandle fileHandleForUpdatingAtPath:fileInDocumentsPath];
-                [file seekToEndOfFile];
-                [file writeData: writeData];
-                [file closeFile];
-                [self.ArrayOfValuesBase removeAllObjects];  //empty storage array
-                numm=0;
-                numms=@"";
-                nummst=@"";
-                fileCount=0;
-            }
-            
-            int count_leddata;
-            
-            int data = number2[i];
-            float signal;
-            signal = (float) data;
-            // Shift the register values.
-            for(int k=40; k>0; k--)
-            {
-                RegX[k] = RegX[k-1];
-                RegX1[k] = RegX1[k-1];
-            }
-            
-            // numerator
-            CenterTap = 0.0;
-            CenterTap1 = 0.0;
-            RegX[0] = signal;
-            RegX1[0] = signal;
-            for(int k=0; k<=40; k++)
-            {
-                CenterTap += fil[k] * RegX[k];
-                CenterTap1 += der[k] * RegX1[k];
-            }
-            
-            [self.ledfilter addObject:[NSNumber numberWithInteger:((int)(CenterTap))]];
-            if(CenterTap1 < 0)
-                CenterTap1= CenterTap1 * -1;
-            [self.ArrayOfValuesGolay addObject:[NSNumber numberWithInteger:((int)(CenterTap1))]];
-            count_leddata = (int)[self.ledfilter count];
-            if(count_leddata>=90) // 61
-            {
-                A = 66000;
-                B = 0;
-                for(int i=0; i<=89;i++)     // till 40
-                {
-                    currentvalue = [(NSNumber *)[self.ledfilter objectAtIndex:(i)] intValue];
-                    if(currentvalue > B)
-                    {
-                        B = currentvalue;       // maximum
-                        
-                    }
-                    if(currentvalue < A)
-                    {
-                        A = currentvalue;      // minimum
-                    }
-                }
-                if(B-A <= 20) //30// 10      // if it is actual value change it to 80
-                {
-                    a = 98;
-                    b = 102;
-                }
-                else
-                {
-                    a = 65;
-                    b = 135;
-                }
-                latest = [(NSNumber *)[self.ledfilter objectAtIndex:(29)] intValue];
-                newvalue = a + (latest - A)*(b-a)/(B-A);
-                newvalue = b - newvalue + a;
-                
-                [self.ArrayOfValues1 removeObjectAtIndex:0];
-                [self.ArrayOfValues1 addObject:[NSNumber numberWithInteger:(newvalue)]];
-                
-                latest = [(NSNumber *)[self.ArrayOfValuesGolay objectAtIndex:(29)] intValue];
-                newvalue = (latest + 20)*4;
-                [self.ArrayOfValues removeObjectAtIndex:0];
-                [self.ArrayOfValues addObject:[NSNumber numberWithInteger:(newvalue)]]; //accelerometer plot
-                
-                [self.ledfilter removeObjectAtIndex:0];
-                [self.ArrayOfValuesGolay removeObjectAtIndex:0];
-                
-                
-                countcheck = countcheck+1;
-                int startindex =0;
-                int betweenindex=0;
-                int endindex = 0;
-                int beatdiffindex=0;
-                float meandiff=0.0;
-                double sum_deviation = 0.0;
-                int temp;
-                int countbeats = 0;
-                static int heartrate = 0;
-                
-                /* count beats */
-                if(countcheck >=1000) // 80
-                {
-                    countcheck = 1; //250
-                    timestamp = timestamp+8;
-                    int k=50;
-                    while(950-k-30 > 10)  // 78
-                    {
-                        int numb1 = [(NSNumber *)[self.ArrayOfValues1 objectAtIndex:(950-k-30)] intValue];
-                        int numb2 = [(NSNumber *)[self.ArrayOfValues1 objectAtIndex:(950-k)] intValue];
-                        int numb3 = [(NSNumber *)[self.ArrayOfValues1 objectAtIndex:(950-k+30)] intValue];
-                        if (numb2 > numb3 && numb2 > numb1 && numb2 - numb3 > 15 && numb2 - numb1 > 15 && numb2 < 250 && numb2 > 0)
-                        {
-                            countbeats = countbeats + 1;
-                            if (startindex == 0)
-                            {
-                                startindex = k;
-                            }
-                            else
-                            {
-                                betweenindex = k;
-                                beatdiffindex = betweenindex - endindex;
-                                [self.beatdifference addObject:[NSNumber numberWithInteger:(beatdiffindex)]];
-                                meandiff += beatdiffindex;
-                            }
-                            endindex = k;
-                            k=k+70;
-                        }
-                        else
-                        {
-                            k=k+10;
-                        }
-                    }
-                    if (countbeats >= 7)
-                    {
-                        meandiff = meandiff/(125*(countbeats-1));
-                        for(int i=0;i<countbeats-1;i++)
-                        {
-                            temp = [(NSNumber *)[self.beatdifference objectAtIndex:(i)] intValue];
-                            sum_deviation += (temp/125 - meandiff) * (temp/125-meandiff);
-                        }
-                        sum_deviation = sum_deviation*1000/(countbeats-1);  // 1000 (ms)
-                        sum_deviation = sqrt(sum_deviation);
-                        countbeats = (countbeats-1)*125*60/(endindex-startindex);
-                        if(printbeat == 0)
-                        {
-                            heartrate = countbeats;
-                            printbeat = 1;
-                        }
-                        else
-                        {
-                            heartrate = (0.3*heartrate + 0.7*countbeats);
-                        }
-                        
-                        self.temperature.text=[NSString stringWithFormat:@"%d", heartrate];//(int)(sum_deviation)]; // heartrate
-                        
-                    }
-                    [self.beatdifference removeAllObjects];
-                    countbeats = 0;
-                }
-                /* count beats end */
-                
-            }
-            
-        }
-        
-        
-    }
-    
-    
-    
-    //_myGraph.delegate = self;
-   // _RespGraph.delegate = self;
-    
-    //[self.myGraph reloadGraph];
-    [self.RespGraph reloadGraph];
-#if QPP_LOG_FILE
-    // write data to log file
-    [writeBuf appendBytes:[data bytes] length:20 ];
-#endif
-    
-    bleDevMonitor *dev = [bleDevMonitor sharedInstance];
-     [dev stopScan];
-     
-     [self voleStartDidConnActInd];
-    
+//    [[NSNotificationCenter defaultCenter] postNotificationName : bleDiscoveredCharacteristicsNoti
+//                                                        object : nil
+//                                                      userInfo : nil];
 }
 
-- (void)viewDidUnload {
-    [self setReceivedDataLabel:nil];
-    [self setDevNameLabel:nil];
-    [self setConnStatusLabel:nil];
-    [super viewDidUnload];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation{
-    
-    return NO;
-}
-
-- (IBAction)_FileButton:(id)sender {
-    NSLog(@"here");
-    fname = [NSString stringWithFormat:@"ecg[%d][%@].txt",received_data_length,refDate];
-    
-}
-
-/*
- Hex 2 NSData.
- */
--(NSString *)hexData2NSString:(NSData *)toConvertData : (int16_t)strLenght
+/*********************************************************************
+ Invoked upon completion of a -[updateValueForCharacteristic:]
+ request or on the reception of a notification/indication.
+ *********************************************************************/
+- (void) peripheral:(CBPeripheral *)aPeripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    ///// 将16进制数据转化成Byte 数组
-    NSString *hexString = @" "; //16进制字符串
-    
-    const uint8_t *arrData = [toConvertData bytes];
-    
-    ///3ds key的Byte 数组， 128位
-    for(int i=0; i < strLenght; i++)
-    {
+    for (CBService *aService in aPeripheral.services)
+    {   /// CBCharacteristicPropertyWriteWithoutResponse
+        [bleUpdateForOtaDelegate bleDidUpdateValueForOtaChar : aService
+                                                    withChar : characteristic
+                                                       error : error];
         
-        unichar hex_char1 = arrData[i]>>4; ////两位16进制数中的第一位(高位*16)
-        int int_ch1;
-        if(hex_char1 >= '0' && hex_char1 <='9')
-            int_ch1 = (hex_char1+48);   //// 0 的Ascll - 48
-        else if(hex_char1 >= 'A' && hex_char1 <='F')
-            int_ch1 = (hex_char1+55); //// A 的Ascll - 65
-        else
-            int_ch1 = (hex_char1+87); //// a 的Ascll - 97
-        
-        // hexString = [hexString stringByAppendingString:[NSString stringWithFormat:@"%x",int_ch1]];
-        hexString = [hexString stringByAppendingString:[NSString stringWithFormat:@"%x", hex_char1]];
-        
-        unichar hex_char2 = arrData[i]&0x0f; ///两位16进制数中的第二位(低位)
-        int int_ch2;
-        if(hex_char2 >= '0' && hex_char2 <='9')
-            int_ch2 = (hex_char2+48); //// 0 的Ascll - 48
-        else if(hex_char1 >= 'A' && hex_char1 <='F')
-            int_ch2 = hex_char2+55; //// A 的Ascll - 65
-        else
-            int_ch2 = hex_char2+87; //// a 的Ascll - 97
-        
-        hexString = [hexString stringByAppendingString:[NSString stringWithFormat:@"%x",hex_char2]];
-        
-        i++;
-        
-        //hexString = [hexString stringByAppendingString:[NSString stringWithFormat:@"%x",arrData[i]]];
-        
-        //  NSLog(@"hexString:%@",hexString);
-    }
-    
-    // NSData *newData = [[NSData alloc] initWithBytes:bytes length:strLenght];
-    // NSLog(@"newData=%@",newData);
-    
-    
-    // NSData 2 NSString.
-    // NSString *testString = [[NSString alloc] initWithData:newData encoding:NSUTF8StringEncoding];
-    
-    return hexString;
-}
-
-- (NSString *)toGetFileName{
-    // create file manager
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    // get the path
-    // arg:NSDocumentDirectory: to get the path
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    
-    // change to the path to be access
-    [fileManager changeCurrentDirectoryPath:[documentsDirectory stringByExpandingTildeInPath]];
-    
-    // to get file's path
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:@"testAudio.caf"];
-    
-    return filePath;
-}
-
-#pragma mark - bleDevMonitorDelegate
-
-/// display vole peripheral list
-- (void)voleDisplayPeripherals //:(CBPeripheral *)aPeripheral
-{
-    [self.voleScanDevActInd stopAnimating];
-    
-    // create the alert
-    NSArray *volePeriList = [[bleDevMonitor sharedInstance] discoveredPeripherals ];// [[otaFirmwareFile sharedInstance] enumBinFiles];
-    
-    self.voleDisplayDevicesVC = [TableViewAlert tableAlertWithTitle:@"Choose a Peripheral..." cancelButtonTitle:@"Cancel" numberOfRows:^NSInteger (NSInteger section)
-                                 {
-                                     return [volePeriList count];
-                                 }
-                                 
-                                                           andCells:^UITableViewCell* (TableViewAlert *anAlert, NSIndexPath *indexPath)
-                                 {
-                                     static NSString *CellIdentifier = @"CellIdentifier";
-                                     UITableViewCell *cell = [anAlert.table dequeueReusableCellWithIdentifier:CellIdentifier];
-                                     
-                                     if (cell == nil)
-                                         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-                                     
-                                     //cell.textLabel.text = [[volePeriList objectAtIndex:indexPath.row] name];
-                                     NSString *temp=[[NSUserDefaults standardUserDefaults] valueForKey:@"localName"];
-                                     cell.textLabel.text=temp;
-                                     
-                                     return cell;
-                                 }];
-    
-    // Setting custom alert height
-    self.voleDisplayDevicesVC.height = 250;
-    
-    // configure actions to perform
-    [self.voleDisplayDevicesVC configureSelectionBlock:^(NSIndexPath *selectedIndex){
-        self.devNameLabel.text = [[volePeriList objectAtIndex:selectedIndex.row] name];
-        
-        NSDictionary *dictPeri = [NSDictionary dictionaryWithObject : [volePeriList objectAtIndex:selectedIndex.row] forKey:@"selectedDevice"];
-        
-        [[NSNotificationCenter defaultCenter]postNotificationName: voleSelOnePeripheralNoti object:nil userInfo:dictPeri];
-        
-    } andCompletionBlock:^{
-        self.devNameLabel.text = @"No Device! \n";
-    }];
-    
-    // show the alert
-    [self.voleDisplayDevicesVC show];
-}
-
-/// connect act ind.
-- (void) voleStartDidConnActInd
-{
-    [self.voleDidConnDevActInd startAnimating];
-    
-    // voleDidConnDevTimeoutCount = 0;
-    
-    voleDidConnDevTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval : VOLE_DIDCONN_DEV_TIMEOUT/* VOLE_TIMER_STEP */ target:self selector:@selector(voleDidConnDevTimeoutRsp) userInfo:nil repeats : NO];
-}
-
-- (void)voleSelOnePeripheralRsp :(NSNotification *)notifyFromPeripheral
-{
-    NSLog(@"%s", __func__);
-    
-    CBPeripheral *selectedPeri = [notifyFromPeripheral.userInfo objectForKey:@"selectedDevice"];
-    
-    NSLog(@"testPeri = %@ \n", selectedPeri);
-    
-    /// to conect the peripheral
-    bleDevMonitor *dev = [bleDevMonitor sharedInstance];
-    [dev stopScan];
-    
-    [self voleStartDidConnActInd];
-    
-    [dev connectPeripheral : selectedPeri];
-}
-
-- (void) voleDidConnDevTimeoutRsp{
-    
-    // voleDidConnDevTimeoutCount++;
-    
-    // if(voleDidConnDevTimeoutCount > VOLE_DIDCONN_DEV_TIMEOUT)
-    {
-        [self voleStopDidConnDevTimeout];
-        
-        /// to scan a device timeout.
-        CustomAlertView *voleDidConnDevAlert = [[CustomAlertView alloc] initWithTitle:@"Warning!"
-                                                                              message:@"Connection Failed!"
-                                                                             delegate:nil
-                                                                    cancelButtonTitle:nil/*@"Cancel" */
-                                                                    otherButtonTitles:@"OK", nil];
-        [voleDidConnDevAlert show];
     }
 }
 
-- (void) voleStopDidConnDevTimeout
+/*********************************************************************
+ Invoked upon completion of a -[UpdateNotificationStateForCharacteristic:]
+ request or on the reception of a notification/indication.
+ *********************************************************************/
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    voleDidConnDevTimeoutCount = 0;
-    [voleDidConnDevTimeoutTimer invalidate];
-    [self.voleDidConnDevActInd stopAnimating];
-}
 
-- (void)voleResetVC{
-    //    received_data_length = 0;
-    
-    _voleScanDevActInd.hidesWhenStopped = YES;
-    _voleDidConnDevActInd.hidesWhenStopped = YES;
-    
-    [self.voleScanDevActInd stopAnimating];
-    [self.voleDidConnDevActInd stopAnimating];
-    
-    // _voleLoadFileBtn.hidden = YES;
-    
-    /// data rate
-    // volePreTimeMs = 0l;
-    // voleCurTimeMs = 0l;
-    
-    voleScanDevTimeoutCount = 0;
-    [voleScanDevTimeoutTimer invalidate];
-    
-    voleDidConnDevTimeoutCount = 0;
-    [voleDidConnDevTimeoutTimer invalidate];
-    
-}
-
--(void) volePlayerReset
-{
-    writeBuf = [NSMutableData alloc] ;
-    
-    received_data_length = 0;
-}
-
-- (void)updateScanCountDown : (BOOL)flag withCount : (uint8_t)ScanCountDn
-{
-    if(flag)
-    {
-        _voleScanCountDnLbl.text = [NSString stringWithFormat:@"%d", ScanCountDn];
-        _voleScanCountDnLbl.hidden = NO;
-        _voleScanCountDnUnitLbl.hidden = NO;
-    }
-    else
-    {
-        _voleScanCountDnLbl.text = @"0";
-        _voleScanCountDnLbl.hidden = YES;
-        _voleScanCountDnUnitLbl.hidden = YES;
-    }
-}
-
-- (void) voleUpdateDidConnDev
-{
-    NSLog(@"method: %s", __func__);
-    
-    [self voleStopDidConnDevTimeout];
-    [self refreshConnectBtns];
 }
 
 @end
-
-
-

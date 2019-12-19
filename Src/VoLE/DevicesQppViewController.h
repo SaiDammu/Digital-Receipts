@@ -20,4 +20,5 @@
 -(void) updatePeriInTableView:(UIRefreshControl *)refreshControl;
 
 +(DevicesQppViewController *)sharedInstance;
+
 @end

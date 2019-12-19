@@ -10,9 +10,8 @@
 
 #import <UIKit/UIKit.h>
 
-
 #import "QBleClient.h"
-#import "otaApi.h"
+#import "OtaApi.h"
 
 
 /// #define UUID_OTA_SERVICE                 @"FEE8"
@@ -106,7 +105,7 @@ typedef enum
 
 @class TableViewAlert;
 
-@interface RootViewController : UIViewController <bleDidCentConnectPeriDelegate,bleDidCentConnectPeriDelegate, otaApiUpdateAppDataDelegate, otaEnableConfirmDelegate> {
+@interface RootViewController : UIViewController <bleDidCentConnectPeriDelegate, otaApiUpdateAppDataDelegate, otaEnableConfirmDelegate> {
     
     NSData *newFwFile;
     

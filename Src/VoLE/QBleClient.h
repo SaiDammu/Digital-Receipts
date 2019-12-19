@@ -2,7 +2,7 @@
 //  QBleClient.h
 //  Qpp Demo
 //
-//  @brief Application Programming Interface Header File for NXP Ble Client.
+//  @brief Application Programming Interface Header File for Quintic Ble Client.
 //
 //  Created by NXP on 5/18/14.
 //  Copyright (c) 2014 NXP. All rights reserved.
@@ -16,71 +16,55 @@
 #import <IOBluetooth/IOBluetooth.h>
 #endif
 
-///// to notify discovered a peripheral to app layer
+/// to notify discovered a peripheral to app layer
 #define blePeriDiscoveredNoti                      @"ble-PeriDiscoveredNoti"
 
-///// to notify discovered Services to app layer
-#define bleDiscoveredServicesNoti                  @"ble-ServicesDiscoveredNoti"
-
 /// to notify discovered Services to app layer
-#define bleDiscoveredCharacteristicsNoti            @"ble-CharacteristicsDiscoveredNoti"
+#define bleDiscoveredServicesNoti                  @"ble-DiscoverServicesNoti"
 
+/// to notify discovered Charas to app layer
+#define bleDiscoveredCharacteristicsNoti           @"ble-DiscoveredCharasNoti"
 
-
-
-#define keyQppPeriWritten              @"key-QppPeriWritten"
-/// to notify write rsp to app layer
-#define bleWriteValueForCharNoti            @"ble-WriteValueForCharNoti"
-
-/// for Qpp
-#define didBleUpdateValueForQppCharNoti          @"str-didBleUpdateValueForQppChar-Noti"
-#define keyPeriInUpdateValueForQppCharNoti       @"key-PeriInUpdateValueForQppChar"
-#define keySvcInUpdateValueForQppCharNoti        @"key-SvcInUpdateValueForQppChar"
-#define keyCharInUpdateValueForQppCharNoti       @"key-CharInUpdateValueForQppChar"
-#define keyErrorInUpdateValueForQppCharNoti      @"key-ErrorInUpdateValueForQppChar"
-
-
-
-@protocol bleDidConnectionsDelegate
+@protocol bleDidCentConnectPeriDelegate
 
 /**
- *****************************************************************
+ ****************************************************************************************
  * @brief       delegate ble update connected peripheral.
  *
  * @param[out]  aPeripheral : the connected peripheral.
  *
- *****************************************************************
+ ****************************************************************************************
  */
 -(void)bleDidConnectPeripheral : (CBPeripheral *)aPeripheral;
 
 /**
- *****************************************************************
+ ****************************************************************************************
  * @brief       delegate ble update disconnected peripheral.
  *
  * @param[out]  aPeripheral : the disconnected peripheral.
  * @param[out]  error
  *
- *****************************************************************
+ ****************************************************************************************
  */
 -(void)bleDidDisconnectPeripheral : (CBPeripheral *)aPeripheral error : (NSError *)error;
 
 /**
- *****************************************************************
+ ****************************************************************************************
  * @brief       delegate ble update connected peripheral.
  *
  * @param[out]  aPeripheral : the connected peripheral.
  *
- *****************************************************************
+ ****************************************************************************************
  */
-/// -(void)bleDidRetrievePeripheral : (NSArray *)aPeripheral;
+-(void)bleDidRetrievePeripheral : (NSArray *)aPeripheral;
 
 /**
- *****************************************************************
+ ****************************************************************************************
  * @brief       delegate ble update connected peripheral.
  *
  * @param[out]  aPeripheral : the connected peripheral.
  *
- *****************************************************************
+ ****************************************************************************************
  */
 -(void)bleDidFailToConnectPeripheral : (CBPeripheral *)aPeripheral
                                error : (NSError *)error;
@@ -88,37 +72,35 @@
 @end
 
 /// ble update for char delegate.
-@protocol bleUpdateForQppDelegate
+@protocol bleUpdateForOtaDelegate
 
 /**
- *****************************************************************
+ ****************************************************************************************
  * @brief       delegate ble update service and chara.
  *
  * @param[out]  aPeripheral    : the peripheral connected.
- * @param[out]  aService       : the QPP service discovered.
- * @param[out]  error          : the error from CoreBluetooth.
+ * @param[out]  aService       : the OTA service discovered.
+ * @param[out]  error          : the error from CoreBluetooth if there is.
  *
- *****************************************************************
+ ****************************************************************************************
  */
--(void)bleDidUpdateCharForQppService : (CBPeripheral *)aPeri
-                         withService : (CBService *)aService
-                               error : (NSError *)error;
+-(void)bleDidUpdateCharForOtaService : (CBPeripheral *)aPeri
+                      withService : (CBService *)aService
+                            error : (NSError *)error;
 
 /**
- *****************************************************************
+ ****************************************************************************************
  * @brief       delegate ble update value for Char.
  *
- * @param[out]  aPeripheral    : the peripheral connected.
- * @param[out]  aService       : the QPP service discovered.
- * @param[out]  characteristic : the QPP characteristic updated.
- * @param[out]  error          : the error from CoreBluetooth.
+ * @param[out]  aService       : the OTA service discovered.
+ * @param[out]  characteristic : the OTA characteristic updated.
+ * @param[out]  error          : the error from CoreBluetooth if there is.
  *
- *****************************************************************
+ ****************************************************************************************
  */
--(void)bleDidUpdateValueForQppChar : (CBPeripheral*)aPeripheral
-                       withService : (CBService *)aService
-                          withChar : (CBCharacteristic *)characteristic
-                             error : (NSError *)error;
+-(void)bleDidUpdateValueForOtaChar : (CBService *)aService
+                       withChar : (CBCharacteristic *)characteristic
+                          error : (NSError *)error;
 
 @end
 
@@ -131,16 +113,22 @@
 }
 
 /// update Connection/Disconnect/Retrieve/FailtoConnect Peripheral.
-@property (nonatomic, assign) id <bleDidConnectionsDelegate> bleDidConnectionsDelegate;
+@property (nonatomic, assign) id <bleDidCentConnectPeriDelegate> bleDidCentConnectPeriDelegate;
 
 /// update value/state for char to xxx Profile
-@property (nonatomic, assign) id <bleUpdateForQppDelegate>  bleUpdateForQppDelegate;
+@property (nonatomic, assign) id <bleUpdateForOtaDelegate>  bleUpdateForOtaDelegate;
 
 /**********************************************************************
  * @brief output these discovered peripherals after scanning.
  *
  **********************************************************************/
 @property (nonatomic, readonly, retain) NSMutableArray *discoveredPeripherals;
+
+/**********************************************************************
+ * @brief output these discovered peripherals after scanning.
+ *
+ **********************************************************************/
+@property (nonatomic, readonly, retain) NSMutableArray *discoveredServices;
 
 /**
  **********************************************************************
@@ -175,7 +163,7 @@
  **********************************************************************
  * @brief Api Or App layer to connect a peripheral
  *
- * @param[in] aPeripheral  : peripheral to connect
+ * @param[in] aPeripheral  : the peripheral to connnect.
  *
  **********************************************************************
  */
@@ -185,7 +173,7 @@
  **********************************************************************
  * @brief Api Or App layer to disconnect a peripheral
  *
- * @param[in] aPeripheral  : peripheral to connect
+ * @param[in] aPeripheral  : the peripheral to disconnect.
  *
  **********************************************************************
  */
@@ -195,7 +183,7 @@
  **********************************************************************
  * @brief Api Or App layer to retrieve a Peripheral
  *
- * @param[in] aPeripheral  : peripheral to connect
+ * @param[in] aPeripheral  : the peripheral to retrieve
  *
  **********************************************************************
  */

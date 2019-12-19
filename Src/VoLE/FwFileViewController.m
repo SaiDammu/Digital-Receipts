@@ -9,7 +9,7 @@
 //
 
 #import "qnLoadFile.h"
-#import "otaAppPublic.h"
+#import "OtaAppPublic.h"
 #import "FwFileViewController.h"
 
 @interface FwFileViewController ()

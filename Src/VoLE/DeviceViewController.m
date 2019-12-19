@@ -9,7 +9,9 @@
 //
 
 #import "QBleClient.h"
+#import "QbleQppClient.h"
 #import "QppPublic.h"
+#import "OtaAppPublic.h"
 #import "DeviceViewController.h"
 
 @interface DeviceViewController ()
@@ -26,7 +28,7 @@
     }
     return self;
 }
-
+/*
 +(DeviceViewController *)sharedInstance{
     static DeviceViewController *_sharedInstance = nil;
     if (_sharedInstance == nil) {
@@ -35,19 +37,23 @@
     
     return _sharedInstance;
 }
-
+*/
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
+     self.view.backgroundColor = [UIColor blackColor];
     NSLog(@"%s", __func__);
+
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceListReloadDataRsp) name:ReloadDevListDataNoti object:nil];
+    //OTA
+     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceListReloadDataRsp) name:appDevListReloadDataNoti object:nil];
+     
+     _refreshControl = [[UIRefreshControl alloc] init];
+     [_refreshControl addTarget:self action:@selector(updatePeriInTableView:) forControlEvents:UIControlEventValueChanged];
+     [deviceList addSubview:_refreshControl];
     
-    _refreshControl = [[UIRefreshControl alloc] init];
-    [_refreshControl addTarget:self action:@selector(updatePeriInTableView:) forControlEvents:UIControlEventValueChanged];
-    [deviceList addSubview:_refreshControl];
+    
 }
 
 - (void)viewUnDidLoad
@@ -70,8 +76,10 @@
  *****************************************************************
  */
 - (IBAction)backQppMainVC:(id)sender {
-    [[NSNotificationCenter defaultCenter] postNotificationName : qppMainStopScanNoti object:nil userInfo:nil];
+  //  [[NSNotificationCenter defaultCenter] postNotificationName : qppMainStopScanNoti object:nil userInfo:nil];
     
+    //OTA
+      [[NSNotificationCenter defaultCenter] postNotificationName : mainVcStopScanNoti object:nil userInfo:nil];
     /// [self dismissModalViewControllerAnimated:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -89,8 +97,12 @@
 {
     // Return the number of rows in the section.
     //    NSLog(@"%s ", __func__);
+    if (self.isOTA) {
+        return [[qBleClient sharedInstance].discoveredPeripherals count];
+    }else{
+        return [[qBleQppClient sharedInstance].discoveredPeripherals count];
+    }
     
-    return [[qBleClient sharedInstance].discoveredPeripherals count];
 }
 
 /**
@@ -116,14 +128,27 @@
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    if ([[qBleClient sharedInstance] discoveredPeripherals] == nil)
-    {
-        NSLog(@"cell:nil \n");
-        return cell;
+    NSArray *peripherals;
+    if (_isOTA) {
+         if ([[qBleClient sharedInstance] discoveredPeripherals] == nil)
+           {
+               NSLog(@"cell:nil \n");
+               return cell;
+           }
+           
+            peripherals = [[qBleClient sharedInstance] discoveredPeripherals];
+
+    }else{
+        if ([[qBleQppClient sharedInstance] discoveredPeripherals] == nil)
+           {
+               NSLog(@"cell:nil \n");
+               return cell;
+           }
+           
+            peripherals = [[qBleQppClient sharedInstance] discoveredPeripherals];
+
     }
-    
-    NSArray *peripherals = [[qBleClient sharedInstance] discoveredPeripherals];
-    
+       
     //    NSLog(@"arr :%d \n",indexPath.row);
     CBPeripheral *peripheral = [peripherals objectAtIndex:indexPath.row];
     
@@ -145,26 +170,58 @@
  */
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    qBleClient *dev = [qBleClient sharedInstance];
-    [dev stopScan];
+    NSArray *peripherals;
     
-    NSArray *peripherals = [dev discoveredPeripherals];
+    if (_isOTA) {
+        qBleClient *dev = [qBleClient sharedInstance];
+        [dev stopScan];
+        
+        peripherals = [dev discoveredPeripherals];
+        
+        // protect code
+        uint8_t perIndex = indexPath.row;
+        
+        if (perIndex > [peripherals count]){
+            perIndex = [peripherals count];
+        };
+           CBPeripheral *selectedPeri = [peripherals objectAtIndex:perIndex /*indexPath.row*/];
+           
+           NSDictionary *dictPeri = [NSDictionary dictionaryWithObject : selectedPeri forKey:keyOtaAppSelectPeri];
+           [[NSNotificationCenter defaultCenter] postNotificationName: otaAppSelOnePeripheralNoti object:nil userInfo:dictPeri];
+           
+           [dev pubConnectPeripheral : selectedPeri];
+        
+    }else{
+        
+       // if (!_isHeartRate) {
+            qBleQppClient *dev = [qBleQppClient sharedInstance];
+            [dev stopScan];
+            
+            peripherals = [dev discoveredPeripherals];
+            
+            // protect code
+            uint8_t perIndex = indexPath.row;
+            
+            if (perIndex > [peripherals count]){
+                perIndex = [peripherals count];
+            };
+            
+            CBPeripheral *selectedPeri = [peripherals objectAtIndex:perIndex ];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName: qppSelOnePeripheralNoti object:selectedPeri userInfo:nil];
+                
+            [dev pubConnectPeripheral : selectedPeri];
+            
+        
+       // }
+        
+ 
+    }
+
     
-    // protect code
-    uint8_t perIndex = indexPath.row;
-    
-    if (perIndex > [peripherals count]){
-        perIndex = [peripherals count];
-    };
-    
-    // CBPeripheral *peripheral
-    CBPeripheral *selectedPeri = [peripherals objectAtIndex:perIndex ];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: qppSelOnePeripheralNoti object:selectedPeri userInfo:nil];
-    
-    [dev pubConnectPeripheral : selectedPeri];
-    
-    [self backQppMainVC:nil];
+
+       
+       [self backQppMainVC:nil];
 }
 
 - (void)endRefresh
@@ -190,3 +247,4 @@
     [deviceList reloadData];
 }
 @end
+

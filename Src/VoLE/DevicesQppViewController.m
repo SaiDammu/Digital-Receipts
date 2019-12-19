@@ -39,7 +39,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
+    self.view.backgroundColor = [UIColor blackColor];
     NSLog(@"%s", __func__);
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceListReloadDataRsp) name:ReloadDevListDataNoti object:nil];

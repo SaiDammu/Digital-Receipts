@@ -9,7 +9,6 @@
 //
 
 #import "QppApi.h"
-#import "QBleClient.h"
 
 #import "qppApiCtrl.h"
 
@@ -59,8 +58,8 @@
     qppDiscoveryState = STATE_DISCOVERED_NONE;
     
     /// setup receive data callback delegate.
-    [qBleClient sharedInstance].bleUpdateForQppDelegate = self;
-    
+    [qBleClient sharedInstance].bleUpdateForOtaDelegate = self;
+    [qBleQppClient sharedInstance].bleUpdateForQppDelegate = self;
 #if _ENABLE_SUB_THREAD
     
     [self initQppApi];
@@ -76,6 +75,7 @@
  * @return : all QppApi methods.
  *****************************************************************
  */
+
 + (QppApi *)sharedInstance
 {
     static QppApi *_sharedInstance = nil;
@@ -91,7 +91,7 @@
     
     objCtrl=[[qppApiCtrl alloc] init];
     
-    objCtrl.times=20;
+    objCtrl.times=40;
     objCtrl.lengOfPkg2Send=182;
     
     [self updateQppDataLength:objCtrl];

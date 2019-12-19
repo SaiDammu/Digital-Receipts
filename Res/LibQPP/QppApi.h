@@ -17,7 +17,7 @@
 #endif
 
 #import "QBleClient.h"
-
+#import "QbleQppClient.h"
 #define didQppEnableConfirmForAppNoti               @"str-didQppEnableConfirmForApp-Noti"
 #define keyPeriInQppEnableConfirmed             @"key-PeriInQppEnableConfirmForApp"
 #define keyWrCharInQpp                          @"key-WrCharInQppEnableConfirmForApp"
@@ -73,7 +73,7 @@
 @end
 
 /// an Objective-C interface 
-@interface QppApi : NSObject<bleUpdateForQppDelegate>{
+@interface QppApi : NSObject<bleUpdateForOtaDelegate,bleUpdateForQppDelegate>{
     
 }
 
