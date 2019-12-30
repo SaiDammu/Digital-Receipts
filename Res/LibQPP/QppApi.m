@@ -30,6 +30,7 @@
     CBCharacteristic *qppWrChar,*qppNtfChar;    /// Char for write
     
     int qppDiscoveryState;          /// qpp discovery svc/char/ state
+    BOOL isOTA;
     
 #if _ENABLE_SUB_THREAD
     /// write subthread
@@ -54,11 +55,13 @@
 - (id)init
 {
     self = [super init];
-    
     qppDiscoveryState = STATE_DISCOVERED_NONE;
     
     /// setup receive data callback delegate.
-    [qBleClient sharedInstance].bleUpdateForOtaDelegate = self;
+    
+    NSLog(@"test 33");
+    
+   // [qBleClient sharedInstance].bleUpdateForOtaDelegate = self;
     [qBleQppClient sharedInstance].bleUpdateForQppDelegate = self;
 #if _ENABLE_SUB_THREAD
     
@@ -169,6 +172,7 @@
         [self trigOneWriteBlock];
     }
 }
+
 
 
 -(void)startQppStateMachine:(qppApiCtrl *)_objCtrl{
@@ -315,6 +319,8 @@
         }
     }
 }
+
+
 
 /**
  *****************************************************************

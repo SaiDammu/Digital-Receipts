@@ -29,7 +29,7 @@
 #import "CustomAlertView.h"
 #import "Utils.h"
 
-#import "DeviceViewController.h"
+#import "DevicesQppViewController.h"
 #import "OTAViewController.h"
 #import "RootViewController.h"
 
@@ -440,47 +440,82 @@ volatile int initialcount = 0;
 
 -(void)back:(id)sender{
   
+     qBleQppClient *dev = [qBleQppClient sharedInstance];
+    
+       CBPeripheralState stateConnected = devInfo.qppPeri.state; /// iOS 9.0.2
+       if (stateConnected==CBPeripheralStateConnected)/// iOS 9.0.2
+       {
+           
+           qppCentState = QPP_CENT_DISCONNECTING;
+           
+           [dev pubDisconnectPeripheral : devInfo.qppPeri];
+                      
+       }
     [self.navigationController popViewControllerAnimated:YES];
 }
 -(void)searchDisconnectButtonAction:(UIBarButtonItem*)item{
-    flagOnePeriScanned = FALSE;
-    [self ScanPeri];
+   // flagOnePeriScanned = FALSE;
+    //[self ScanPeri];
+    
+    //scanDisconnectItem.title = @"Scan";
+    
+    qBleQppClient *dev = [qBleQppClient sharedInstance];
+    
+    #if QPP_IOS8
+        BOOL isConnected = qppConnectedPeri.isConnected;
+        
+        if (isConnected)
+    #endif
+    
+       CBPeripheralState stateConnected = devInfo.qppPeri.state; /// iOS 9.0.2
+       if (stateConnected==CBPeripheralStateConnected)/// iOS 9.0.2
+       {
+             [self qppReset];
+           
+           qppCentState = QPP_CENT_DISCONNECTING;
+           
+           [dev pubDisconnectPeripheral : devInfo.qppPeri];
+          // [qppApi qppEnableNotify : devInfo.qppPeri withNtfChar : devInfo.aQppNtfChar withEnable : NO];
+           scanDisconnectItem.title = @"Disconnect";
+           [dev stopScan];
+       }else{
+           if((qppCentState != QPP_CENT_SCANNING) &&
+              (qppCentState != QPP_CENT_CONNECTING) )
+           {
+               qppCentState = QPP_CENT_SCANNING;
+               
+               //[self.ptScanDevActInd startAnimating];
+               
+               [dev stopScan];
+               [dev startScan];
+               
+               // [dev startScan];
+               
+               scanDisconnectItem.title = @"Scan";
+           }
+       }
     
 }
 
-
--(void)ScanPeri{
-    qBleQppClient *dev = [qBleQppClient sharedInstance];
- 
-    CBPeripheralState stateConnected = devInfo.qppPeri.state; /// iOS 9.0.2
-    if (stateConnected==CBPeripheralStateConnected)/// iOS 9.0.2
-    {
-        //  [self qppReset];
-        
-        qppCentState = QPP_CENT_DISCONNECTING;
-        
-        [dev pubDisconnectPeripheral : devInfo.qppPeri];
-        scanDisconnectItem.title = @"Disconnect";
-    }
-    else
-    {
-        if((qppCentState != QPP_CENT_SCANNING) &&
-           (qppCentState != QPP_CENT_CONNECTING) )
-        {
-            qppCentState = QPP_CENT_SCANNING;
-            
-            //[self.ptScanDevActInd startAnimating];
-            
-            [dev stopScan];
-            
-            // [dev startScan];
-            NSLog(@"test");
-            scanDisconnectItem.title = @"Scan";
-        }
-    }
-    if ([scanDisconnectItem.title isEqualToString:@"Scan"]){
-        [dev startScan];
-    }
+-(void)qppReset{
+    flagDataMonitoring = false;
+    
+    fEdited=false;
+    
+    dataRateStart = 0;
+    dataReceived = 0;
+    //_qppDataRateAvgLbl.text = @"0";
+    //_qppDataRateDynLbl.text = @"0";
+    
+    preTimeMs = 0l;
+    curTimeMs = 0l;
+    
+    dynRefTimeMs = 0l;
+    
+    qppDataRateMin = 10000;
+    qppDataRateMax = 0;
+    qppCentState = QPP_CENT_IDLE;
+    //[self qppSendReset];
 }
 -(void)initDevicesInfo{
     devInfo = [[DevicesCtrl alloc] init];
@@ -575,7 +610,6 @@ volatile int initialcount = 0;
     qppCentState = QPP_CENT_IDLE;
     
     [[qBleQppClient sharedInstance] stopScan];
-    
     
 }
 -(void)readQpp{
@@ -731,15 +765,16 @@ volatile int initialcount = 0;
         
         /// [self presentModalViewController : deviceVC animated:YES ];
         if ([scanDisconnectItem.title isEqualToString:@"Scan"]) {
-            DeviceViewController *deviceVC = [[DeviceViewController alloc]init];
-            deviceVC.isOTA = NO;
+            DevicesQppViewController *deviceVC = [[DevicesQppViewController alloc]init];
+            //deviceVC.isOTA = NO;
             [self presentViewController: deviceVC animated:YES completion:nil];
+            
         }
-      
          
     }
    
 }
+ 
 #pragma mark - qpp delegate
 - (void)didQppReceiveData : (CBPeripheral *) aPeripheral
              withCharUUID : (CBUUID *)qppUUIDForNotifyChar
@@ -827,9 +862,7 @@ volatile int initialcount = 0;
 #endif
     
     
-    [qppApi qppEnableNotify : devInfo.qppPeri
-                withNtfChar : devInfo.aQppNtfChar
-                 withEnable : YES];
+   // [qppApi qppEnableNotify : devInfo.qppPeri withNtfChar : devInfo.aQppNtfChar withEnable : YES];
     
     
     
@@ -1217,18 +1250,47 @@ volatile int initialcount = 0;
     
     /// UI
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppDisplayPeripherals) name:strQppScanPeriEndNoti object:nil];
-    
-    
-    
+        
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppSelOnePeripheralRsp:) name : qppSelOnePeripheralNoti object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppMainStopScan) name : qppMainStopScanNoti object:nil];
     //qpp
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didQppEnableConfirmForAppRsp:) name: didQppEnableConfirmForAppNoti object:nil];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(qppWriteValueForCharRsp:) name : bleWriteValueForCharNotiQpp object:nil];
     
 }
-
+-(void)qppWriteValueForCharRsp : (NSNotification *)noti
+{
+#if 0
+    if(qppCentState == QPP_CENT_IDLE)
+    {
+        return;
+    }
+    
+    if(devInfo.fQppWrRepeat)
+    {
+        CBPeripheral *aPeri = [noti.userInfo objectForKey: keyQppPeriWritten];
+        if([aPeri isEqual: devInfo.qppPeri])
+        {
+            //[btnSend setTitle:@"Stop" forState : UIControlStateNormal];
+            
+            Byte *dataSentPkgArr = (Byte *)[devInfo.data2Send bytes];
+            dataSentPkgArr[0]++;
+    
+            /// devInfo.dat a2Send = [[NSData alloc] initWithBytes : dataSentPkgArr length : [devInfo.data 2Send length]];
+            ///QppApi *qppApi = [QppApi sharedInstance];
+            
+            [qppApi qppSendData : devInfo.qppPeri
+                       withData : devInfo.data2Send
+                       withType : CBCharacteristicWriteWithResponse];
+            
+            /// update UI
+            qppSendCounter++;
+           // repeatCounterLbl.text = [NSString stringWithFormat:@"%lld", qppSendCounter];
+        }
+    }
+#endif
+}
 - (int)numberOfPointsInGraph {
     return (int)[self.ArrayOfValues count];
 }

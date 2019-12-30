@@ -171,12 +171,12 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSArray *peripherals;
-    
+    NSLog(@"test 11");
     if (_isOTA) {
-        qBleClient *dev = [qBleClient sharedInstance];
-        [dev stopScan];
+        //qBleClient *dev = ;
+        [[qBleClient sharedInstance] stopScan];
         
-        peripherals = [dev discoveredPeripherals];
+        peripherals = [[qBleClient sharedInstance] discoveredPeripherals];
         
         // protect code
         uint8_t perIndex = indexPath.row;
@@ -188,8 +188,8 @@
            
            NSDictionary *dictPeri = [NSDictionary dictionaryWithObject : selectedPeri forKey:keyOtaAppSelectPeri];
            [[NSNotificationCenter defaultCenter] postNotificationName: otaAppSelOnePeripheralNoti object:nil userInfo:dictPeri];
-           
-           [dev pubConnectPeripheral : selectedPeri];
+       // dev.bleUpdateForOtaDelegate = self;
+           [[qBleClient sharedInstance] pubConnectPeripheral : selectedPeri];
         
     }else{
         
@@ -208,9 +208,11 @@
             
             CBPeripheral *selectedPeri = [peripherals objectAtIndex:perIndex ];
             
+        NSLog(@"sel peri %@",selectedPeri);
+        
             [[NSNotificationCenter defaultCenter] postNotificationName: qppSelOnePeripheralNoti object:selectedPeri userInfo:nil];
                 
-            [dev pubConnectPeripheral : selectedPeri];
+           // [dev pubConnectPeripheral : selectedPeri];
             
         
        // }
