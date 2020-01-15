@@ -11,8 +11,8 @@
 #import "QppPublic.h"
 #import "OtaAppPublic.h"
 
-@interface DevicesQppViewController ()
 
+@interface DevicesQppViewController ()
 @end
 
 @implementation DevicesQppViewController
@@ -41,6 +41,9 @@
     // Do any additional setup after loading the view from its nib.
     self.view.backgroundColor = [UIColor blackColor];
     NSLog(@"%s", __func__);
+    
+
+    
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceListReloadDataRsp) name:ReloadDevListDataNoti object:nil];
     
@@ -160,7 +163,6 @@
     CBPeripheral *selectedPeri = [peripherals objectAtIndex:perIndex ];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: qppSelOnePeripheralNoti object:selectedPeri userInfo:nil];
-    
     [dev pubConnectPeripheral : selectedPeri];
     
     [self backQppMainVC:nil];

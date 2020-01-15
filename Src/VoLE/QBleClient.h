@@ -21,6 +21,7 @@
 
 /// to notify discovered Services to app layer
 #define bleDiscoveredServicesNoti                  @"ble-DiscoverServicesNoti"
+#define bleWriteValueForCharNoti            @"ble-WriteValueForCharNoti"
 
 /// to notify discovered Charas to app layer
 #define bleDiscoveredCharacteristicsNoti           @"ble-DiscoveredCharasNoti"

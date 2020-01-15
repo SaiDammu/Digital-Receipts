@@ -1,16 +1,14 @@
 //
-//  QbleQppClient.m
-//  VoLE Demo
+//  QBleClient.m
+//  Qpp Demo
 //
-//  Created by Sai Seshu Sarath Chandra Dammu on 12/3/19.
-//  Copyright © 2019 Apple Inc. All rights reserved.
+// @brief Application Programming Interface Source File for NXP Ble Client.
+//
+//  Created by NXP on 5/18/14.
+//  Copyright (c) 2014 NXP. All rights reserved.
 //
 
 #import "QbleQppClient.h"
-
-@implementation QbleQppClient
-
-@end
 
 @interface qBleQppClient ()
 {
@@ -349,7 +347,7 @@
 {
     /// NSLog(@"func : %s", __func__);
     
-    NSDictionary *dictPeri = [NSDictionary dictionaryWithObject : aPeripheral forKey:keyQppPeriWrittenQpp];
+    NSDictionary *dictPeri = [NSDictionary dictionaryWithObject : aPeripheral forKey:keyQppPeriWritten];
     
     [[NSNotificationCenter defaultCenter] postNotificationName: bleWriteValueForCharNotiQpp object:nil userInfo : dictPeri];
 }
@@ -359,4 +357,3 @@
 }
 
 @end
-

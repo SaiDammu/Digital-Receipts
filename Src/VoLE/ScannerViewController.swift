@@ -9,6 +9,7 @@
 import UIKit
 import CoreBluetooth
 
+
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
   switch (lhs, rhs) {
   case let (l?, r?):
@@ -34,7 +35,7 @@ class ScannerViewController: UIViewController, CBCentralManagerDelegate, UITable
 
     let dfuServiceUUIDString  = "00001530-1212-EFDE-1523-785FEABCD123"
     let ANCSServiceUUIDString = "7905F431-B5CE-4E99-A40F-4B1E122D00D0"
-
+    
     //MARK: - ViewController Properties
     var bluetoothManager : CBCentralManager?
     var delegate         : ScannerDelegate?
@@ -140,7 +141,14 @@ class ScannerViewController: UIViewController, CBCentralManagerDelegate, UITable
         
         let centralQueue = DispatchQueue(label: "no.nordicsemi.nRFToolBox", attributes: [])
         bluetoothManager = CBCentralManager(delegate: self, queue: centralQueue)
+        
+        
+        
+        
     }
+    
+   
+    
     
     override func viewWillDisappear(_ animated: Bool) {
         let success = self.scanForPeripherals(false)
@@ -180,11 +188,28 @@ class ScannerViewController: UIViewController, CBCentralManagerDelegate, UITable
         if let peri = peripherals{
             let peripheral = peri[indexPath.row].peripheral
             self.delegate?.centralManagerDidSelectPeripheral(withManager: bluetoothManager!, andPeripheral: peripheral)
-            self.dismiss(animated: true, completion: nil)
         }
+        	
+       
+       // let dev = QbleQppClient.
+        let dev = qBleQppClient.sharedInstance()
+        dev?.stopScan()
+ 
+        let peripherals = dev?.discoveredPeripherals
+        var perIndex = indexPath.row
         
+        if perIndex>peripherals?.count{
+            perIndex = peripherals!.count
+        }
+        if peripherals?.count>0{
+        let selectedPeri = peripherals![perIndex]
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "qppSelOnePeripheral-Notification"), object: selectedPeri, userInfo: nil)
+        }
+           self.dismiss(animated: true, completion: nil)
+          //  [[NSNotificationCenter defaultCenter] postNotificationName: qppSelOnePeripheralNoti object:selectedPeri userInfo:nil];
+       
         
-        //self.navigationController?.popViewController(animated: true)
+ 
     }
     
     //MARK: - CBCentralManagerDelgate

@@ -8,6 +8,7 @@
 import Foundation
 
 class ServiceIdentifiers: NSObject {
+    
     //MARK: - CGM Identifiers
     static let cgmServiceUUIDString                                 = "0000181F-0000-1000-8000-00805F9B34FB"
     static let cgmGlucoseMeasurementCharacteristicUUIDString        = "00002AA7-0000-1000-8000-00805F9B34FB"

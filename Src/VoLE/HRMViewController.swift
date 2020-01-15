@@ -63,6 +63,10 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
     var graph                           : CPTGraph?
     var peripheral                      : CBPeripheral?
     var scanButton                      : UIBarButtonItem!
+    
+    @objc var enableTwoGraphs:Bool = Bool()
+    
+    
     //MARK: - UIVIewController Outlets
   //  @IBOutlet weak var verticalLabel: UILabel!
   //  @IBOutlet weak var battery: UIButton!
@@ -72,11 +76,17 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
     @IBOutlet weak var hrValue: UILabel!
     @IBOutlet weak var graphView: CPTGraphHostingView!
     
+    @IBOutlet weak var topMargin: NSLayoutConstraint!
+    @IBOutlet weak var topSpace: UIView!
+    @IBOutlet weak var titleHeight: NSLayoutConstraint!
+    @IBOutlet weak var graphBottomSpace: NSLayoutConstraint!
+    @IBOutlet weak var bpmView: NSLayoutConstraint!
+    
+    @IBOutlet weak var bottomSpace: NSLayoutConstraint!
     //MARK: - UIVIewController Actions
-    @IBAction func connectionButtonTapped(_ sender: AnyObject) {
+     @IBAction func connectionButtonTapped(_ sender: AnyObject) {
         print("connect tapped")
-        if peripheral != nil
-        {
+        if peripheral != nil{
             bluetoothManager?.cancelPeripheralConnection(peripheral!)
         }
          
@@ -105,17 +115,24 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // Rotate the vertical label
            self.deviceName.textColor = .black
         
+        //embed vc
+       /* self.titleHeight.constant = 0
+        self.bpmView.constant = 0
+        self.graphBottomSpace.constant = 350
+        */
         scanButton = UIBarButtonItem(title: "Scan", style: .plain, target: self, action: #selector(self.scanButtonAction)) // action:#selector(Class.MethodName) for swift 3
         self.navigationItem.rightBarButtonItem  = scanButton
         
-        hrServiceUUID                    = CBUUID(string: ServiceIdentifiers.hrsServiceUUIDString)
-              hrMeasurementCharacteristicUUID  = CBUUID(string: ServiceIdentifiers.hrsHeartRateCharacteristicUUIDString)
-              hrLocationCharacteristicUUID     = CBUUID(string: ServiceIdentifiers.hrsSensorLocationCharacteristicUUIDString)
-              batteryServiceUUID               = CBUUID(string: ServiceIdentifiers.batteryServiceUUIDString)
-              batteryLevelCharacteristicUUID   = CBUUID(string: ServiceIdentifiers.batteryLevelCharacteristicUUIDString)
+        
+        hrServiceUUID = CBUUID(string: ServiceIdentifiers.hrsServiceUUIDString)
+        hrMeasurementCharacteristicUUID  = CBUUID(string: ServiceIdentifiers.hrsHeartRateCharacteristicUUIDString)
+        hrLocationCharacteristicUUID     = CBUUID(string: ServiceIdentifiers.hrsSensorLocationCharacteristicUUIDString)
+        batteryServiceUUID               = CBUUID(string: ServiceIdentifiers.batteryServiceUUIDString)
+        batteryLevelCharacteristicUUID   = CBUUID(string: ServiceIdentifiers.batteryLevelCharacteristicUUIDString)
         
        // verticalLabel.transform = CGAffineTransform(translationX: -(verticalLabel.frame.width/2) + (verticalLabel.frame.height / 2), y: 0.0).rotated(by: -.pi / 2)
         isBluetoothOn           = false
@@ -127,11 +144,52 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
         xValues  = NSMutableArray()
         
         initLinePlot()
+        
+        //Embedd qpp
+        if enableTwoGraphs{
+            self.deviceName.text = ""
+            //okay, lets stop this work , open resume
+            self.topMargin.constant = 300.0
+            self.bottomSpace.constant = 30.0
+            let containerView = UIView()
+            containerView.translatesAutoresizingMaskIntoConstraints = false
+            self.view.addSubview(containerView)
+            
+            let controller = QBlueVoLEViewController(nibName: "QBlueVoLEViewController", bundle: .main)
+            
+            controller.willMove(toParent: self)
+            self.view.addSubview(controller.view)
+            self.addChild(controller)
+            controller.didMove(toParent: self)
+            containerView.addSubview(controller.view)
+            controller.view.frame = CGRect(x: 0, y: 64, width: self.view.frame.size.width-90, height: 240)
+            
+            controller.view.clipsToBounds = true
+      
+            
+        }
+        
+        
+    }
+  
+    //objc to swift
+    @objc func connectHRM(_ aPeripheral:CBPeripheral){
+        print("hrm connect")
+        
+        // bluetoothManager = aManager;
+        bluetoothManager!.delegate = self;
+        
+        // The sensor has been selected, connect to it
+        peripheral = aPeripheral;
+        aPeripheral.delegate = self;
+        let options = NSDictionary(object: NSNumber(value: true as Bool), forKey: CBConnectPeripheralOptionNotifyOnNotificationKey as NSCopying)
+        bluetoothManager!.connect(aPeripheral, options: options as? [String : AnyObject])
+        bluetoothManager?.cancelPeripheralConnection(aPeripheral)
     }
     
     
     @objc func scanButtonAction(){
-        print("connect tapped")
+
         if peripheral != nil
         {
             bluetoothManager?.cancelPeripheralConnection(peripheral!)
@@ -153,6 +211,10 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
         if peripheral != nil && isBackButtonPressed == true
         {
             bluetoothManager?.cancelPeripheralConnection(peripheral!)
+            
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "DisconnectQpp"), object: nil, userInfo: nil)
+            
+            
         }
     }
     
@@ -167,7 +229,6 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
         //Initialize and display Graph (x and y axis lines)
         graph = CPTXYGraph(frame: graphView.bounds)
         self.graphView.hostedGraph = self.graph;
-        
         
         //apply styling to Graph
         graph?.apply(CPTTheme(named: CPTThemeName.plainWhiteTheme))
@@ -235,6 +296,8 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
         lineStyle.lineWidth = 2
         lineStyle.lineColor = CPTColor.black()
         linePlot!.dataLineStyle = lineStyle;
+     
+       
         
         let symbolLineStyle = CPTMutableLineStyle(style: lineStyle)
         symbolLineStyle.lineColor = CPTColor.black()
@@ -336,7 +399,7 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
         bluetoothManager!.connect(aPeripheral, options: options as? [String : AnyObject])
     }
     
-    
+
     //MARK: - CPTPlotDataSource
     
     func numberOfRecords(for plot :CPTPlot) -> UInt {
@@ -513,15 +576,37 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
         guard error == nil else {
             print("Error occurred while updating characteristic value: \(error!.localizedDescription)")
             return
+        
         }
+        
         
         DispatchQueue.main.async {
             
             if let id1 = self.hrMeasurementCharacteristicUUID, let id2 = self.hrLocationCharacteristicUUID, let id3 = self.batteryLevelCharacteristicUUID{
                 if characteristic.uuid.isEqual(id1) {
-                    let value = self.decodeHRValue(withData: characteristic.value!)
-                    self.addHRvalueToGraph(data: Int(value))
-                    self.hrValue.text = "BPM : \(value)"
+                    
+                    if self.enableTwoGraphs{
+                        let valuesArray = self.decodeRRValue(withData: characteristic.value!)
+                        
+                        for value in valuesArray {
+                            self.addHRvalueToGraph(data: Int(value))
+                            self.hrValue.text = "RR : \(value)"
+                           // print("value \(Int(value))")
+                        }
+                        
+                    }else{
+                        let valuesArray = self.decodeHRValue(withData: characteristic.value!)
+                        
+                        let value = self.decodeHRValue(withData: characteristic.value!)
+                        self.addHRvalueToGraph(data: Int(value))
+                        self.hrValue.text = "\(value)"
+                        
+                    }
+                    
+
+                    
+                    
+                    //print("\(self.hrValue.text)")
                     self.hrValue.textColor = .black
                 } else if characteristic.uuid.isEqual(id2) {
                     //self.hrLocation.text = self.decodeHRLocation(withData: characteristic.value!)
@@ -573,7 +658,7 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
         return NSDecimalNumber(value: Date().timeIntervalSince1970 as Double)
     }
 
-    func decodeHRValue(withData data: Data) -> Int {
+    func decodeRRValue(withData data: Data) -> Array<Int> {
         let count = data.count / MemoryLayout<UInt8>.size
         var array = [UInt8](repeating: 0, count: count)
         (data as NSData).getBytes(&array, length:count * MemoryLayout<UInt8>.size)
@@ -585,8 +670,35 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
             //Convert Endianess from Little to Big
             bpmValue = Int(UInt16(array[2] * 0xFF) + UInt16(array[1]))
         }
-        return bpmValue
+        print("BPM:\(bpmValue)")
+        
+        let characters = Array(data.hexString)
+        let rr1Hex = "\(characters[14])\(characters[15])\(characters[12])\(characters[13])"
+        let rr2Hex = "\(characters[10])\(characters[11])\(characters[08])\(characters[09])"
+        
+        let rr1String = Int(rr1Hex, radix: 16)!
+        let rr2String = Int(rr2Hex, radix: 16)!
+        
+        let rrArray = [rr1String,rr2String]
+        
+        return rrArray
     }
+    
+    func decodeHRValue(withData data: Data) -> Int {
+           let count = data.count / MemoryLayout<UInt8>.size
+           var array = [UInt8](repeating: 0, count: count)
+           (data as NSData).getBytes(&array, length:count * MemoryLayout<UInt8>.size)
+           
+           var bpmValue : Int = 0;
+           if ((array[0] & 0x01) == 0) {
+               bpmValue = Int(array[1])
+           } else {
+               //Convert Endianess from Little to Big
+               bpmValue = Int(UInt16(array[2] * 0xFF) + UInt16(array[1]))
+           }
+           return bpmValue
+       }
+    
     
     func decodeHRLocation(withData data:Data) -> String {
         let location = (data as NSData).bytes.bindMemory(to: UInt16.self, capacity: data.count)
@@ -610,4 +722,3 @@ class HRMViewController: UIViewController, CBCentralManagerDelegate, CBPeriphera
         }
     }
 }
-

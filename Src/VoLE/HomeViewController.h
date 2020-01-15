@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
-
+@class HRMViewController;
 @interface HomeViewController : UIViewController
 
 @end

@@ -1,12 +1,12 @@
 //
-//  QbleQppClient.h
-//  VoLE Demo
+//  QBleQppClient.h
+//  Qpp Demo
 //
-//  Created by Sai Seshu Sarath Chandra Dammu on 12/3/19.
-//  Copyright © 2019 Apple Inc. All rights reserved.
+//  @brief Application Programming Interface Header File for NXP Ble Client.
 //
-
-#import <Foundation/Foundation.h>
+//  Created by NXP on 5/18/14.
+//  Copyright (c) 2014 NXP. All rights reserved.
+//
 
 #import <Foundation/Foundation.h>
 
@@ -18,29 +18,24 @@
 
 ///// to notify discovered a peripheral to app layer
 #define blePeriDiscoveredNotiQpp                      @"ble-PeriDiscoveredNoti"
+
 ///// to notify discovered Services to app layer
 #define bleDiscoveredServicesNotiQpp                  @"ble-ServicesDiscoveredNoti"
 
 /// to notify discovered Services to app layer
 #define bleDiscoveredCharacteristicsNotiQpp            @"ble-CharacteristicsDiscoveredNoti"
 
-#define keyQppPeriWrittenQpp              @"key-QppPeriWritten"
+
+#define keyQppPeriWritten              @"key-QppPeriWritten"
 /// to notify write rsp to app layer
-#define bleWriteValueForCharNotiQpp           @"ble-WriteValueForCharNoti"
+#define bleWriteValueForCharNotiQpp            @"ble-WriteValueForCharNoti"
 
 /// for Qpp
-#define didBleUpdateValueForQppCharNotiQpp        @"str-didBleUpdateValueForQppChar-Noti"
-#define keyPeriInUpdateValueForQppCharNotiQpp       @"key-PeriInUpdateValueForQppChar"
-#define keySvcInUpdateValueForQppCharNotiQpp        @"key-SvcInUpdateValueForQppChar"
-#define keyCharInUpdateValueForQppCharNotiQpp       @"key-CharInUpdateValueForQppChar"
-#define keyErrorInUpdateValueForQppCharNotiQpp      @"key-ErrorInUpdateValueForQppChar"
-
-
-
-
-@interface QbleQppClient : NSObject
-
-@end
+#define didBleUpdateValueForQppCharNoti          @"str-didBleUpdateValueForQppChar-Noti"
+#define keyPeriInUpdateValueForQppCharNoti       @"key-PeriInUpdateValueForQppChar"
+#define keySvcInUpdateValueForQppCharNoti        @"key-SvcInUpdateValueForQppChar"
+#define keyCharInUpdateValueForQppCharNoti       @"key-CharInUpdateValueForQppChar"
+#define keyErrorInUpdateValueForQppCharNoti      @"key-ErrorInUpdateValueForQppChar"
 
 
 
@@ -125,7 +120,7 @@
 
 @end
 
-
+/// declare qBleClient class
 @class qBleQppClient;
 
 /// declare qBleClient interface
@@ -144,11 +139,7 @@
  *
  **********************************************************************/
 @property (nonatomic, readonly, retain) NSMutableArray *discoveredPeripherals;
-/**********************************************************************
- * @brief output these discovered peripherals after scanning.
- *
- **********************************************************************/
-@property (nonatomic, readonly, retain) NSMutableArray *discoveredServices;
+
 /**
  **********************************************************************
  * @brief Represents the current state of a CBCentralManager.

@@ -57,9 +57,7 @@
     self = [super init];
     qppDiscoveryState = STATE_DISCOVERED_NONE;
     
-    /// setup receive data callback delegate.
-    
-    NSLog(@"test 33");
+    /// setup receive data callback delegate
     
    // [qBleClient sharedInstance].bleUpdateForOtaDelegate = self;
     [qBleQppClient sharedInstance].bleUpdateForQppDelegate = self;
@@ -367,7 +365,12 @@
 - (void) qppEnableNotify : (CBPeripheral *)aPeripheral
              withNtfChar : (CBCharacteristic *)ntfChar
                withEnable:(BOOL)enable{
-    [aPeripheral setNotifyValue:enable forCharacteristic:ntfChar];
+    if (ntfChar != nil){
+        
+        [aPeripheral setNotifyValue:enable forCharacteristic:ntfChar];
+        
+}
+
 }
 
 /**

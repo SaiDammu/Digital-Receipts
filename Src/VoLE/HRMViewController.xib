@@ -10,9 +10,11 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HRMViewController" customModule="Extract" customModuleProvider="target">
             <connections>
+                <outlet property="bottomSpace" destination="Oax-lS-Ao0" id="IFw-sN-XIN"/>
                 <outlet property="deviceName" destination="cNT-1f-qSg" id="ZaJ-dE-baA"/>
                 <outlet property="graphView" destination="mcW-2Z-5hf" id="Llv-dv-gr9"/>
                 <outlet property="hrValue" destination="SIq-QI-12k" id="unL-vL-uWw"/>
+                <outlet property="topMargin" destination="lIf-tT-clG" id="CVz-GV-SmE"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -71,16 +73,16 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstItem="mcW-2Z-5hf" firstAttribute="top" secondItem="llN-xR-fc7" secondAttribute="bottom" constant="19" id="5Qu-Y7-2x5"/>
                         <constraint firstAttribute="trailingMargin" secondItem="cNT-1f-qSg" secondAttribute="trailing" constant="14" id="7fO-CN-pOI"/>
                         <constraint firstItem="8iK-Gi-THr" firstAttribute="leading" secondItem="u8O-sA-swh" secondAttribute="leading" id="8ad-ld-6bo"/>
                         <constraint firstAttribute="centerY" secondItem="Y9R-45-CYk" secondAttribute="centerY" id="8rp-GV-kh8"/>
-                        <constraint firstItem="u8O-sA-swh" firstAttribute="bottom" secondItem="mcW-2Z-5hf" secondAttribute="bottom" constant="79" id="IZr-ut-UcN"/>
-                        <constraint firstItem="mcW-2Z-5hf" firstAttribute="trailing" secondItem="cNT-1f-qSg" secondAttribute="trailing" id="Wto-XU-XxC"/>
-                        <constraint firstItem="mcW-2Z-5hf" firstAttribute="leading" secondItem="u8O-sA-swh" secondAttribute="leading" constant="27" id="XvP-4I-2dC"/>
+                        <constraint firstItem="u8O-sA-swh" firstAttribute="trailing" secondItem="mcW-2Z-5hf" secondAttribute="trailing" constant="22" id="B8o-bF-ET0"/>
+                        <constraint firstItem="u8O-sA-swh" firstAttribute="bottom" secondItem="mcW-2Z-5hf" secondAttribute="bottom" constant="79" id="Oax-lS-Ao0"/>
+                        <constraint firstItem="mcW-2Z-5hf" firstAttribute="leading" secondItem="u8O-sA-swh" secondAttribute="leading" constant="27" id="Xkp-Tv-rTn"/>
                         <constraint firstItem="llN-xR-fc7" firstAttribute="centerX" secondItem="u8O-sA-swh" secondAttribute="centerX" id="byV-wg-et7"/>
                         <constraint firstItem="Y9R-45-CYk" firstAttribute="leading" secondItem="u8O-sA-swh" secondAttribute="leading" id="dnj-NK-j3h"/>
                         <constraint firstItem="u8O-sA-swh" firstAttribute="trailing" secondItem="8iK-Gi-THr" secondAttribute="trailing" id="idx-8s-qGw"/>
+                        <constraint firstItem="mcW-2Z-5hf" firstAttribute="top" secondItem="u8O-sA-swh" secondAttribute="top" constant="137" id="lIf-tT-clG"/>
                         <constraint firstItem="llN-xR-fc7" firstAttribute="top" secondItem="cNT-1f-qSg" secondAttribute="bottom" constant="22" id="tj7-3S-l4v"/>
                         <constraint firstItem="cNT-1f-qSg" firstAttribute="top" secondItem="u8O-sA-swh" secondAttribute="top" constant="11" id="u2u-1Q-6F4"/>
                         <constraint firstItem="8iK-Gi-THr" firstAttribute="top" secondItem="u8O-sA-swh" secondAttribute="top" id="xQi-0S-aSE"/>
@@ -90,7 +92,7 @@
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
-            <point key="canvasLocation" x="137.68115942028987" y="124.72826086956523"/>
+            <point key="canvasLocation" x="-88" y="388"/>
         </view>
     </objects>
     <resources>

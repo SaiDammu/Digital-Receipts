@@ -10,6 +10,8 @@
 #import "QBlueVoLEViewController.h"
 #import "RootViewController.h"
 #import "Extract-Swift.h"
+#import "QppViewController.h"
+
 @interface HomeViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>
 {
     NSArray *titlesArray;
@@ -22,7 +24,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     self.title = @"VoLE";
-    titlesArray = @[@"QPP",@"OTA",@"Heart rate monitor"];
+    titlesArray = @[@"QPP",@"OTA",@"HRM",@"Graphs"];
     self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     UICollectionViewFlowLayout *layout=[[UICollectionViewFlowLayout alloc] init];
@@ -77,16 +79,26 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.row == 0){
         
-        QBlueVoLEViewController *qbvc = [[QBlueVoLEViewController alloc]initWithNibName:@"QBlueVoLEViewController" bundle:[NSBundle mainBundle]];
+        QppViewController *qvc = [[QppViewController alloc]initWithNibName:@"QppViewController_iPhone" bundle:[NSBundle mainBundle]];
+        [self.navigationController pushViewController:qvc animated:YES];
+        
+     /*   QBlueVoLEViewController *qbvc = [[QBlueVoLEViewController alloc]initWithNibName:@"QBlueVoLEViewController" bundle:[NSBundle mainBundle]];
+        qbvc.enableTwoGraphs = NO;
         qbvc.view.backgroundColor = [UIColor whiteColor];
         [self.navigationController pushViewController:qbvc animated:YES];
-        
+      */
     }else if (indexPath.row == 1){
         RootViewController *rbvc = [[RootViewController alloc]initWithNibName:@"RootViewController" bundle:[NSBundle mainBundle]];
         [self.navigationController pushViewController:rbvc animated:YES];
     }else if (indexPath.row == 2){
         HRMViewController *hvc = [[HRMViewController alloc]init];
         [self.navigationController pushViewController:hvc animated:YES];
+    }else if (indexPath.row == 3){
+        
+        HRMViewController *hvc = [[HRMViewController alloc]init];
+        hvc.enableTwoGraphs = true;
+        [self.navigationController pushViewController:hvc animated:YES];
+        
     }
 }
 
